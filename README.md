@@ -9,5 +9,12 @@ To install needed npm packages run
 ```bash
 cd frontend
 npm i
+```
+
+## Usage
+
+To use the frontend module run
+
+```bash
 npm start
 ```
