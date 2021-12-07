@@ -18,3 +18,6 @@ To use the frontend module run
 ```bash
 npm start
 ```
+
+## Documentation
+
