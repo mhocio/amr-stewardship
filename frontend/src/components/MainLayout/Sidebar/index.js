@@ -1,5 +1,5 @@
+// material-ui
 import { styled, useTheme } from '@mui/material/styles';
-
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -13,8 +13,11 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
+import { Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
+
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -25,9 +28,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function DrawerLeft({ toggleDrawer, isOpen }) {
+export default function Sidebar({ toggleDrawer, isOpen }) {
   const theme = useTheme();
-  
+
+  const navigate = useNavigate();
+
   return (
     <Drawer
       sx={{
@@ -51,25 +56,25 @@ export default function DrawerLeft({ toggleDrawer, isOpen }) {
       </DrawerHeader>
       <Divider />
       <List>
-        <ListItem button key='Pacjenci'>
+        <ListItem button key='Pacjenci' onClick={() => navigate('/patients')}>
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
           <ListItemText primary='Pacjenci' />
         </ListItem>
-        <ListItem button key='Trendy'>
+        <ListItem button key='Trendy' onClick={() => navigate('/trends')}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
           <ListItemText primary='Trendy' />
         </ListItem>
-        <ListItem button key='FRAT'>
+        <ListItem button key='FRAT' onClick={() => navigate('/frat')}>
           <ListItemIcon>
             <NumbersIcon />
           </ListItemIcon>
           <ListItemText primary='FRAT' />
         </ListItem>
-        <ListItem button key='Ustawienia'>
+        <ListItem button key='Ustawienia' onClick={() => navigate('/settings')}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>

@@ -1,32 +1,69 @@
 import './styles/App.css';
-import { Route, Routes } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  BrowserRouter,
+  Navigate,
+  Outlet
+} from "react-router-dom";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { plPL } from '@mui/x-data-grid';
+import { blue, yellow } from '@mui/material/colors';
+import MainLayout from './components/MainLayout'
 
-import { ThemeProvider } from '@material-ui/core';
-import { createTheme } from '@material-ui/core/styles';
-import { plPL } from '@mui/material/locale';
+import PatientsPage from './pages/PatientsPage';
+import TrendsPage from './pages/TrendsPage';
 
-import MainPage from './pages/MainPage';
-
-const Theme = createTheme({
+const theme = createTheme({
   palette: {
     primary: {
-      main: '#24345c',
+      main: blue[900],
     },
     secondary: {
-      main: '#fd472c',
+      main: yellow[600],
     },
-    contrastThreshold: 3,
-    tonalOffset: 0.2,
   },
 },
-plPL);
+  plPL
+);
+
+function PrivateOutlet() {
+  const auth = useAuth();
+  return auth ? <Outlet /> : <Navigate to="/login" />;
+}
+
+function PrivateRoute({ children }) {
+  const auth = useAuth();
+  return auth ? children : <Navigate to="/login" />;
+}
+
+const Public = () => <div>public</div>;
+const Private = () => <div>private</div>;
+const Login = () => <div>login</div>;
+
+function useAuth() {
+  return true;
+}
 
 function App() {
   return (
-    <ThemeProvider theme={Theme}>
-      <Routes>
-        <Route path="/main" element={<MainPage/>} />
-      </Routes>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+      <MainLayout>
+        <Routes>
+          <Route path="/patients" element={<PatientsPage />} />
+          <Route path="/trends" element={<TrendsPage />} />
+          <Route
+            path="/private"
+            element={
+              <PrivateRoute>
+                <Private />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+        </MainLayout>
+        </BrowserRouter>
     </ThemeProvider>
   );
 }

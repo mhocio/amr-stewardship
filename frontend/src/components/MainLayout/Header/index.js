@@ -4,9 +4,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import { Typography } from '@material-ui/core';
 import MuiAppBar from '@mui/material/AppBar';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Grid } from '@material-ui/core';
-import Paper from '@mui/material/Paper';
 
 // project imports
 import Account from './Account';
@@ -30,10 +29,6 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Item = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(1),
-  textAlign: 'center',
-}));
 
 export default function Header({ toggleDrawer, isOpen }) {
   return(
