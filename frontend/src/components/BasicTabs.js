@@ -1,9 +1,17 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
+// material-ui
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+
+// project imports
+import SusceptibilityChart from './Charts/SusceptibilityChart';
+import RecommendationChart from './Charts/RecommendationChart';
+import DosageChart from './Charts/DosageChart';
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -18,7 +26,7 @@ function TabPanel(props) {
     >
       {value === index && (
         <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
+          {children}
         </Box>
       )}
     </div>
@@ -46,7 +54,7 @@ export default function BasicTabs() {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', height: '500px'}}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs" centered>
           <Tab label="Zmiany rekomendacji grup antybiotyków" {...a11yProps(0)} />
@@ -55,13 +63,13 @@ export default function BasicTabs() {
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        Item One
+        <RecommendationChart />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <SusceptibilityChart />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <DosageChart />
       </TabPanel>
     </Box>
   );
