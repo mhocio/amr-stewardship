@@ -15,7 +15,6 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import { Link, Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;

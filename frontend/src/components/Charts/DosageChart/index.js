@@ -1,5 +1,9 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import DownloadChartButton from '../../DownloadChartButton';
+import FileSaver from "file-saver";
+import Grid from '@mui/material/Grid'
+import { useCurrentPng } from "recharts-to-png";
 
 const data = [
   {
@@ -46,32 +50,45 @@ const data = [
   },
 ];
 
-export default class DosageChart extends PureComponent {
-  static demoUrl = 'https://codesandbox.io/s/simple-line-chart-kec3v';
+export default function DosageChart() {
 
-  render() {
-    return (
-      <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
-        <LineChart
-          width={500}
-          height={300}
-          data={data}ac
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-          <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-        </LineChart>
-      </ResponsiveContainer>
-    );
-  }
+  const [getPng, { ref: myRef }] = useCurrentPng();
+  const handleDownload = useCallback(async () => {
+    const png = await getPng();
+    if (png) {
+      FileSaver.saveAs(png, "wykres.png");
+    }
+  }, [getPng]);
+
+  return (
+    <Grid container direction="column" spacing={3} wrap="nowrap">
+    <Grid item xs={9}>
+    <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
+      <LineChart
+        ref={myRef}
+        width={500}
+        height={300}
+        data={data} ac
+        margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+        }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+        <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+      </LineChart>
+    </ResponsiveContainer>
+    </Grid>
+      <Grid item>
+        <DownloadChartButton handle={handleDownload} />
+      </Grid>
+    </Grid>
+  );
 }

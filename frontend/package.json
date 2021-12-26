@@ -14,11 +14,13 @@
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "file-saver": "^2.0.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.1",
     "react-scripts": "^2.1.3",
     "recharts": "^2.1.8",
+    "recharts-to-png": "^1.1.1",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

@@ -1,5 +1,9 @@
-import React, { PureComponent } from 'react';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { PureComponent, useCallback } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Grid from '@mui/material/Grid'
+import DownloadChartButton from '../../DownloadChartButton';
+import FileSaver from "file-saver";
+import { useCurrentPng } from "recharts-to-png";
 
 const data = [
   {
@@ -46,31 +50,45 @@ const data = [
   },
 ];
 
-export default class SusceptibilityChart extends PureComponent {
+export default function SusceptibilityChart() {
 
-  render() {
-    return (
-      <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
-        <BarChart
-          width={500}
-          height={300}
-          data={data}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="pv" fill="#8884d8" />
-          <Bar dataKey="uv" fill="#82ca9d" />
-        </BarChart>
-      </ResponsiveContainer>
-    );
-  }
+  const [getPng, { ref: myRef }] = useCurrentPng();
+  const handleDownload = useCallback(async () => {
+    const png = await getPng();
+    if (png) {
+      FileSaver.saveAs(png, "wykres.png");
+    }
+  }, [getPng]);
+
+  return (
+    <Grid container direction="column" spacing={3} wrap="nowrap">
+      <Grid item xs={9}>
+        <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
+          <BarChart
+            ref={myRef}
+            width={500}
+            height={300}
+            data={data}
+            margin={{
+              top: 5,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="pv" fill="#8884d8" />
+            <Bar dataKey="uv" fill="#82ca9d" />
+          </BarChart>
+        </ResponsiveContainer>
+      </Grid>
+      <Grid item>
+        <DownloadChartButton handle={handleDownload} />
+      </Grid>
+    </Grid>
+  );
 }
