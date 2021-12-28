@@ -8,6 +8,7 @@ import { Typography } from '@material-ui/core';
 import MuiAppBar from '@mui/material/AppBar';
 import { styled } from '@mui/material/styles';
 import { Grid } from '@material-ui/core';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 
 // project imports
 import Account from './Account';
@@ -32,30 +33,39 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 
-export default function Header({ toggleDrawer, isOpen }) {
-  return(
-      <AppBar position="fixed" open={isOpen}>
+export default function Header({ toggleDrawer, isOpen, isAuth }) {
+  return (
+    <AppBar position="fixed" open={isOpen}>
       <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="toggle drawer"
-          onClick={toggleDrawer}
-          edge="start"
-          sx={{ mr: 2, ...(isOpen && { display: 'none' }) }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Grid container spacing={2} justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography variant="h6" noWrap component="div">
-          System do zarządzania antybiotykoterapią
-        </Typography>
+        {isAuth &&
+          <IconButton
+            color="inherit"
+            aria-label="toggle drawer"
+            onClick={toggleDrawer}
+            edge="start"
+            sx={{ mr: 2, ...(isOpen && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+        }
+        <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center">
+          <Grid container spacing={1} direction="row" alignItems="center" wrap="nowrap">
+            {!isAuth && 
+            <Grid item>
+              <LocalHospitalIcon fontSize="large" />
+            </Grid>}
+            <Grid item>
+              <Typography variant="h6" noWrap component="div">
+                System do zarządzania antybiotykoterapią
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item>
-          <Account person='Jan Kowalski'/>
-        </Grid>
+          <Account person='Jan Kowalski' />
         </Grid>
 
       </Toolbar>
     </AppBar>
-  )}
+  )
+}

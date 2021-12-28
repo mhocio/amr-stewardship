@@ -1,13 +1,40 @@
 import * as React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
 import { Grid } from '@material-ui/core';
 import { Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
+import IconButton from '@mui/material/IconButton';
+import InfoIcon from '@mui/icons-material/Info';
+import { DataGrid, GridColDef, GridApi, GridCellValue } from '@mui/x-data-grid';
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'firstName', headerName: 'Imię', width: 120 },
-  { field: 'lastName', headerName: 'Nazwisko', width: 120 }
+  { field: 'id', headerName: 'ID', width: 50 },
+  { field: 'firstName', headerName: 'Imię', width: 100 },
+  { field: 'lastName', headerName: 'Nazwisko', width: 100 },
+  {
+    field: 'Info',
+    headerName: '',
+    width: 30,
+    sortable: false,
+    renderCell: (params) => {
+      const onClick = (e) => {
+        e.stopPropagation(); // don't select this row after clicking
+
+        const api = params.api;
+        const thisRow= {};
+
+        api
+          .getAllColumns()
+          .filter((c) => c.field !== '__check__' && !!c)
+          .forEach(
+            (c) => (thisRow[c.field] = params.getValue(params.id, c.field)),
+          );
+
+        return alert(JSON.stringify(thisRow, null, 4));
+      };
+
+      return <IconButton onClick={onClick}><InfoIcon /></IconButton>;
+    },
+  },
 ];
 
 const rows = [

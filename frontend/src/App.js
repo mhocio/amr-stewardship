@@ -1,5 +1,5 @@
 import './styles/App.css';
-import React , { Component}  from 'react';
+import React from 'react';
 import {
   Routes,
   Route,
@@ -14,6 +14,9 @@ import MainLayout from './components/MainLayout'
 
 import PatientsPage from './pages/PatientsPage';
 import TrendsPage from './pages/TrendsPage';
+import FratPage from './pages/FratPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 
 const theme = createTheme({
   palette: {
@@ -50,21 +53,24 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
-      <MainLayout>
-        <Routes>
-          <Route path="/patients" element={<PatientsPage />} />
-          <Route path="/trends" element={<TrendsPage />} />
-          <Route
-            path="/private"
-            element={
-              <PrivateRoute>
-                <Private />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+        <MainLayout isAuth={true}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/trends" element={<TrendsPage />} />
+            <Route path="/frat" element={<FratPage />} />
+            <Route
+              path="/private"
+              element={
+                <PrivateRoute>
+                  <Private />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
         </MainLayout>
-        </BrowserRouter>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

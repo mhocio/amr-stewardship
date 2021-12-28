@@ -3,10 +3,12 @@ import React from 'react'
 // material-ui
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
+import { Typography } from '@mui/material';
+import { Divider } from '@mui/material';
 
 // project imports
-import PatientsTable from '../components/PatientsTable';
-import ExamTable from '../components/ExamTable';
+import FratMenu from '../components/FratMenu';
+import FratTable from '../components/FratTable';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -17,16 +19,22 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-const PatientsPage = () => {
+
+const FratPage = () => {
   return (
     <>
       <DrawerHeader />
-      <Grid container spacing={2}>
-        <Grid item xs={3.5}>
-        <PatientsTable />
+      <Grid
+        container
+        direction="column"
+        justifyContent=""
+        spacing={3}
+      >
+        <Grid item>
+          <FratMenu />
         </Grid>
-        <Grid item xs={8.5}>
-        <ExamTable />
+        <Grid item>
+          <FratTable />
         </Grid>
       </Grid>
     </>
@@ -34,4 +42,4 @@ const PatientsPage = () => {
   )
 }
 
-export default PatientsPage
+export default FratPage
