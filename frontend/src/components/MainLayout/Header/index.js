@@ -50,10 +50,11 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
         }
         <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center">
           <Grid container spacing={1} direction="row" alignItems="center" wrap="nowrap">
-            {!isAuth && 
-            <Grid item>
-              <LocalHospitalIcon fontSize="large" />
-            </Grid>}
+            {!isAuth &&
+              <Grid item>
+                <LocalHospitalIcon fontSize="large" />
+              </Grid>
+            }
             <Grid item>
               <Typography variant="h6" noWrap component="div">
                 System do zarządzania antybiotykoterapią
@@ -62,9 +63,10 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
           </Grid>
         </Grid>
         <Grid item>
-          <Account person='Jan Kowalski' />
+          {isAuth &&
+            <Account person='Jan Kowalski' />
+          }
         </Grid>
-
       </Toolbar>
     </AppBar>
   )
