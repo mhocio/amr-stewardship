@@ -49,7 +49,7 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey' },
 ];
 
-export default function DataTable() {
+export default function PatientsTable() {
   return (
     <div style={{ height: '84vh', width: '100%' }}>
       <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">

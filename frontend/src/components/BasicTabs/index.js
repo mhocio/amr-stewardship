@@ -9,12 +9,12 @@ import Grid from '@mui/material/Grid'
 
 
 // project imports
-import SusceptibilityChart from './Charts/SusceptibilityChart';
-import RecommendationChart from './Charts/RecommendationChart';
-import DosageChart from './Charts/DosageChart';
-import AntibioticGroupSelect from './AntibioticGroupSelect';
-import AntibioticSelect from './AntibioticSelect';
-import YearSelect from './YearSelect';
+import SusceptibilityChart from '../Charts/SusceptibilityChart';
+import RecommendationChart from '../Charts/RecommendationChart';
+import DosageChart from '../Charts/DosageChart';
+import AntibioticGroupSelect from '../AntibioticGroupSelect';
+import AntibioticSelect from '../AntibioticSelect';
+import YearSelect from '../YearSelect';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;

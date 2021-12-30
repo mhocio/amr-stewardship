@@ -5,8 +5,8 @@ import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 
 // project imports
-import PatientsTable from '../components/PatientsTable';
-import ExamTable from '../components/ExamTable';
+import PatientsTable from '../components/Tables/PatientsTable';
+import ExamTable from '../components/Tables/ExamTable';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',

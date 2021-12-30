@@ -31,7 +31,7 @@ const StyledTableRow = styled('TableRow')({
   },
 });
 
-export default function DenseTable() {
+export default function FratTable() {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">

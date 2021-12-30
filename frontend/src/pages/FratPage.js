@@ -8,7 +8,7 @@ import { Divider } from '@mui/material';
 
 // project imports
 import FratMenu from '../components/FratMenu';
-import FratTable from '../components/FratTable';
+import FratTable from '../components/Tables/FratTable';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',

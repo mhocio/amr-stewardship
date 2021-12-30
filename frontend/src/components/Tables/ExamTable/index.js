@@ -32,7 +32,7 @@ const rows = [
 
 ];
 
-export default function DataTable() {
+export default function ExamTable() {
   return (
     <div style={{ height: 400, width: '100%' }}>
       <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
