@@ -11,7 +11,7 @@ import { Grid } from '@material-ui/core';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 
 // project imports
-import Account from './Account';
+import Account from './AccountChip';
 
 const drawerWidth = 240;
 
