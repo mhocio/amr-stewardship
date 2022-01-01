@@ -59,7 +59,7 @@ export default function BasicTabs() {
 
   return (
     <Box sx={{ width: '100%', height: '500px' }}>
-      <Box sx={{ marginLeft: '24px', marginRight: '24px'}}>
+      <Box sx={{ marginLeft: '24px', marginRight: '24px' }}>
         <Paper sx={{ padding: '20px' }}>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs" centered>
             <Tab label="Zmiany rekomendacji grup antybiotyków" {...a11yProps(0)} />
@@ -84,14 +84,14 @@ export default function BasicTabs() {
       </TabPanel>
       <TabPanel value={value} index={1}>
         <Grid container direction="row" spacing={2} wrap="nowrap">
-          <Grid container direction="column" spacing={3} wrap="nowrap">
-            <Grid item xs={9}>
-              <SusceptibilityChart />
-            </Grid>
+          <Grid item xs={9}>
+            <SusceptibilityChart />
           </Grid>
           <Grid item xs={3}>
-            <Grid item>
-              <AntibioticSelect />
+            <Grid container direction="column" spacing={3} wrap="nowrap">
+              <Grid item>
+                <AntibioticSelect />
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
