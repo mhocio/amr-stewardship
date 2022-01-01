@@ -1,9 +1,10 @@
-import React, { PureComponent, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Grid from '@mui/material/Grid'
 import DownloadChartButton from '../../DownloadChartButton';
 import FileSaver from "file-saver";
 import { useCurrentPng } from "recharts-to-png";
+import { Paper } from '@mui/material';
 
 const data = [
   {
@@ -63,28 +64,30 @@ export default function SusceptibilityChart() {
   return (
     <Grid container direction="column" spacing={3} wrap="nowrap">
       <Grid item xs={9}>
-        <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
-          <BarChart
-            ref={myRef}
-            width={500}
-            height={300}
-            data={data}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="pv" fill="#8884d8" />
-            <Bar dataKey="uv" fill="#82ca9d" />
-          </BarChart>
-        </ResponsiveContainer>
+        <Paper sx={{ padding: '20px' }}>
+          <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
+            <BarChart
+              ref={myRef}
+              width={500}
+              height={300}
+              data={data}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="pv" fill="#8884d8" />
+              <Bar dataKey="uv" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Paper>
       </Grid>
       <Grid item>
         <DownloadChartButton handle={handleDownload} />

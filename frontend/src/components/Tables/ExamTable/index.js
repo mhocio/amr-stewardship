@@ -3,6 +3,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Typography } from '@mui/material';
 import TopicIcon from '@mui/icons-material/Topic';
 import { Grid } from '@material-ui/core';
+import Paper from '@mui/material/Paper';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 60 },
@@ -34,22 +35,24 @@ const rows = [
 
 export default function ExamTable() {
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
-        <Grid item>
-          <TopicIcon fontSize="large" />
+    <Paper sx={{ padding: '20px', paddingBottom: '70px'}}>
+      <div style={{ height: 400, width: '100%' }}>
+        <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
+          <Grid item>
+            <TopicIcon fontSize="large" />
+          </Grid>
+          <Grid item>
+            <Typography variant="h5">Antybiogramy</Typography>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Typography variant="h5">Antybiogramy</Typography>
-        </Grid>
-      </Grid>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        responsive={'scrollMaxHeight'}
-        hideFooter={true}
-        rowHeight={30}
-      />
-    </div>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          responsive={'scrollMaxHeight'}
+          hideFooter={true}
+          rowHeight={30}
+        />
+      </div>
+    </Paper>
   );
 }

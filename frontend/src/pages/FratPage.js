@@ -3,8 +3,7 @@ import React from 'react'
 // material-ui
 import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
-import { Typography } from '@mui/material';
-import { Divider } from '@mui/material';
+import { Paper } from '@mui/material';
 
 // project imports
 import FratMenu from '../components/FratMenu';
@@ -31,7 +30,9 @@ const FratPage = () => {
         spacing={3}
       >
         <Grid item>
+          <Paper sx={{ padding: '20px'}}>
           <FratMenu />
+          </Paper>
         </Grid>
         <Grid item>
           <FratTable />

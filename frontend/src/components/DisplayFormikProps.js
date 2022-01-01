@@ -14,3 +14,4 @@ export const DisplayFormikProps = props => (
     </pre>
   </div>
 );
+

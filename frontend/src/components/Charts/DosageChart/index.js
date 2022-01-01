@@ -1,9 +1,10 @@
-import React, { PureComponent, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DownloadChartButton from '../../DownloadChartButton';
 import FileSaver from "file-saver";
 import Grid from '@mui/material/Grid'
 import { useCurrentPng } from "recharts-to-png";
+import { Paper } from '@mui/material';
 
 const data = [
   {
@@ -63,6 +64,7 @@ export default function DosageChart() {
   return (
     <Grid container direction="column" spacing={3} wrap="nowrap">
     <Grid item xs={9}>
+    <Paper sx={{ padding: '20px' }}>
     <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
       <LineChart
         ref={myRef}
@@ -85,6 +87,7 @@ export default function DosageChart() {
         <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
       </LineChart>
     </ResponsiveContainer>
+    </Paper>
     </Grid>
       <Grid item>
         <DownloadChartButton handle={handleDownload} />

@@ -5,6 +5,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import { DataGrid, GridColDef, GridApi, GridCellValue } from '@mui/x-data-grid';
+import { Paper } from '@mui/material';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 50 },
@@ -20,7 +21,7 @@ const columns = [
         e.stopPropagation(); // don't select this row after clicking
 
         const api = params.api;
-        const thisRow= {};
+        const thisRow = {};
 
         api
           .getAllColumns()
@@ -51,21 +52,23 @@ const rows = [
 
 export default function PatientsTable() {
   return (
-    <div style={{ height: '84vh', width: '100%' }}>
-      <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
-        <Grid item>
-          <PeopleIcon fontSize="large" />
+    <Paper sx={{ padding: '20px', paddingBottom: '70px' }}>
+      <div style={{ height: '79vh', width: '100%' }}>
+        <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
+          <Grid item>
+            <PeopleIcon fontSize="large" />
+          </Grid>
+          <Grid item>
+            <Typography variant="h5">Pacjenci</Typography>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Typography variant="h5">Pacjenci</Typography>
-        </Grid>
-      </Grid>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        responsive={'scrollMaxHeight'}
-        hideFooter={true}
-      />
-    </div>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          responsive={'scrollMaxHeight'}
+          hideFooter={true}
+        />
+      </div>
+    </Paper>
   );
 }

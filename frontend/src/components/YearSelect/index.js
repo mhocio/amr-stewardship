@@ -1,6 +1,7 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Paper from '@mui/material/Paper';
 // import { options as initialOptions } from "./options";
 
 const initialOptions = [
@@ -14,13 +15,14 @@ const initialOptions = [
 
 export default function YearSelect() {
   return (
+    <Paper sx={{ padding: '20px' }}>
     <Autocomplete
     disablePortal
     id="year-select"
     options={initialOptions}
-    sx={{ width: '35vh' }}
     renderInput={(params) => <TextField {...params} label="Rok" />}
   />
+  </Paper>
   );
 }
 

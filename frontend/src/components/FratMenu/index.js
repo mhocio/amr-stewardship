@@ -1,148 +1,115 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 // material-ui
 import Autocomplete from '@mui/material/Autocomplete';
 import { Typography } from '@mui/material';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import DateFnsUtils from '@date-io/date-fns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import Grid from '@mui/material/Grid';
-import LoadingButton from '@mui/lab/LoadingButton';
-import CalculateIcon from '@mui/icons-material/Calculate';
-// import { options as initialOptions } from "./options";
+import { Button } from '@mui/material';
 
-const initialOptions = [
-  { label: '2016', value: '2016' },
-  { label: '2017', value: '2017' },
-  { label: '2018', value: '2018' },
-  { label: '2019', value: '2019' },
-  { label: '2020', value: '2020' },
-  { label: '2021', value: '2021' }
-];
+// project imports
+import MyDatePicker from '../Forms/DatePicker'
+import AnalyzeButton from '../Forms/Button';
+import MySelect from '../Forms/Select'
+
+// dummy data
+import materials from '../data/materials.json'
+import wards from '../data/wards.json'
+
+const initialValues = {
+  startDate: '',
+  endDate: '',
+  material: '',
+  ward: ''
+}
+
+const validationSchema = Yup.object({
+  startDate: Yup.date()
+    .required("Data początkowa jest wymagana"),
+  endDate: Yup.date()
+    .when(
+      "startDate",
+      (startDate, schema) => startDate && schema.min(startDate))
+    .required("Must enter end date"),
+  material: Yup.string()
+    .required('Badany materiał jest wymagany'),
+  ward: Yup.string()
+    .required('Oddział jest wymagany')
+})
 
 export default function FratMenu() {
 
   const today = new Date();
 
-  const [areFieldsFilled, setAreFieldsFilled] = useState(false);
-  const [errorFlag, setErrorFlag] = useState(false)
-  const [startDate, setStartDate] = React.useState(today);
-  const [endDate, setEndDate] = React.useState(today);
-  const [loading, setLoading] = React.useState(false);
-
-  function handleClick() {
-    setLoading(true);
-  }
-
-  const validateEndDate = (value) => {
-    return value.getTime() > endDate.getTime() ? setStartDateValidation(true) : setStartDateValidation(false)
-  }
-
-  const validateStartDate = (value) => {
-    return value.getTime() < startDate.getTime() ? setStartDateValidation(true) : setStartDateValidation(false)
-  }
-
-  const [isStartDateWrong, setStartDateValidation] = useState(false);
-
-  const handleStartDateChange = (date) => {
-    validateStartDate(date);
-    setStartDate(date);
-    console.log('zmiana startdate: ' + { date })
-  };
-
-  const handleEndDateChange = (date) => {
-    validateEndDate(date);
-    setEndDate(date);
-    console.log('zmiana enddate ' + { date })
-  };
-
-  const checkIfFieldsAreFilled = () => {
-    (startDate && endDate && !isStartDateWrong) ? setAreFieldsFilled(true) : setAreFieldsFilled(false)
-  }
-
-  useEffect(() => {
-    checkIfFieldsAreFilled();
-  })
-
   return (
-    <Grid container direction="column" spacing={1} wrap="nowrap">
-      <Grid container direction="row" spacing={1} wrap="nowrap" justifyContent="flex-start" alignItems="center">
-        <Grid item xs={2}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DesktopDatePicker
-              label="Od"
-              inputFormat="dd/MM/yyyy"
-              value={startDate}
-              onChange={handleStartDateChange}
-              renderInput={(params) => <TextField {...params} />}
-              maxDate={today}
-            />
-          </LocalizationProvider>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      validateOnBlur={false}
+      validateOnChange
+      onSubmit={values => {
+        console.log(values)
+      }}>
+      <Form>
+        <Grid container direction="column" spacing={1} wrap="nowrap">
+          <Grid container direction="row" spacing={1} wrap="nowrap" justifyContent="flex-start" alignItems="center">
+            <Grid item xs={2}>
+              <MyDatePicker
+                name="startDate"
+                label="Od"
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <MyDatePicker
+                name="endDate"
+                label="Do"
+              />
+            </Grid>
+            <Grid container item xs={2} justifyContent="flex-end" >
+              <MySelect
+                name="ward"
+                label="Oddział"
+                options={wards}
+              />
+            </Grid>
+            <Grid container item xs={2} justifyContent="flex-end">
+              <MySelect
+                name="material"
+                label="Badany materiał"
+                options={materials}
+              />
+            </Grid>
+            <Grid container item xs={4} justifyContent="flex-end">
+              <AnalyzeButton>
+                Analizuj
+              </AnalyzeButton>
+            </Grid>
+          </Grid>
+          <Grid container item wrap="nowrap" justifyContent="flex-start" spacing={1} style={{ paddingLeft: 0 }}>
+            <Grid item>
+              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+                12 miesięcy
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+                6 miesięcy
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+                3 miesiące
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item xs={2}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DesktopDatePicker
-              label="Do"
-              inputFormat="dd/MM/yyyy"
-              value={endDate}
-              onChange={handleEndDateChange}
-              renderInput={(params) => <TextField {...params} />}
-              maxDate={today}
-            />
-          </LocalizationProvider>
-        </Grid>
-        <Grid container item xs={2} justifyContent="flex-end" >
-          <Autocomplete
-            disablePortal
-            id="year-select"
-            options={initialOptions}
-            sx={{ width: '25vh' }}
-            renderInput={(params) => <TextField {...params} label="Oddział" />}
-          />
-        </Grid>
-        <Grid container item xs={2} justifyContent="flex-end">
-          <Autocomplete
-            disablePortal
-            id="year-select"
-            options={initialOptions}
-            sx={{ width: '25vh' }}
-            renderInput={(params) => <TextField {...params} label="Badany materiał" />}
-          />
-        </Grid>
-        <Grid container item xs={4} justifyContent="flex-end">
-          <LoadingButton
-            size="large"
-            onClick={handleClick}
-            endIcon={<CalculateIcon />}
-            loading={loading}
-            loadingPosition="end"
-            variant="contained"
-          >
-            Analizuj
-          </LoadingButton>
-        </Grid>
-      </Grid>
-      <Grid container item wrap="nowrap" justifyContent="flex-start" spacing={1} style={{ paddingLeft: 0 }}>
-        <Grid item>
-          <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
-            12 miesięcy
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
-            6 miesięcy
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
-            3 miesiące
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
+      </Form>
+    </Formik>
   );
 }

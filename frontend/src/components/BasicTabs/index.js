@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
-import React  from "react";
+import React from "react";
 
 // material-ui
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper';
 
 
 // project imports
@@ -58,15 +59,17 @@ export default function BasicTabs() {
 
   return (
     <Box sx={{ width: '100%', height: '500px' }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange} aria-label="basic tabs" centered>
-          <Tab label="Zmiany rekomendacji grup antybiotyków" {...a11yProps(0)} />
-          <Tab label="Lekowrażliwość drobnoustrojów" {...a11yProps(1)} />
-          <Tab label="DDD/1000 osobodni hospitalizacji" {...a11yProps(2)} />
-        </Tabs>
+      <Box sx={{ marginLeft: '24px', marginRight: '24px'}}>
+        <Paper sx={{ padding: '20px' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="basic tabs" centered>
+            <Tab label="Zmiany rekomendacji grup antybiotyków" {...a11yProps(0)} />
+            <Tab label="Lekowrażliwość drobnoustrojów" {...a11yProps(1)} />
+            <Tab label="DDD/1000 osobodni hospitalizacji" {...a11yProps(2)} />
+          </Tabs>
+        </Paper>
       </Box>
       <TabPanel value={value} index={0}>
-        <Grid container direction="row" spacing={0} wrap="nowrap">
+        <Grid container direction="row" spacing={2} wrap="nowrap">
           <Grid item xs={9}>
             <RecommendationChart />
           </Grid>
@@ -80,7 +83,7 @@ export default function BasicTabs() {
         </Grid>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <Grid container direction="row" spacing={0} wrap="nowrap">
+        <Grid container direction="row" spacing={2} wrap="nowrap">
           <Grid container direction="column" spacing={3} wrap="nowrap">
             <Grid item xs={9}>
               <SusceptibilityChart />
@@ -94,7 +97,7 @@ export default function BasicTabs() {
         </Grid>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Grid container direction="row" spacing={0} wrap="nowrap">
+        <Grid container direction="row" spacing={2} wrap="nowrap">
           <Grid item xs={9}>
             <DosageChart />
           </Grid>

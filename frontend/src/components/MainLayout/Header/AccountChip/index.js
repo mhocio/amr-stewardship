@@ -7,7 +7,7 @@ import { styled } from '@mui/material/styles';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import { Grid } from '@mui/material';
 import { Divider } from '@mui/material';
-import { List, ListItemButton, ListItemText, ListItemIcon } from '@mui/material';
+import { List, ListItemButton, ListItemText, ListItemIcon, ListSubheader } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function AccountChip({ person }) {
@@ -27,7 +27,7 @@ export default function AccountChip({ person }) {
   const handleClose = (event) => {
     if (anchorEl.current && anchorEl.current.contains(event.target)) {
       return;
-  }
+    }
     setOpen(false);
   };
 
@@ -50,19 +50,25 @@ export default function AccountChip({ person }) {
       }}>
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={350}>
-            <Paper>
+            <Paper sx={{ boxShadow: 3 }}>
               <ClickAwayListener onClickAway={handleClose}>
-                <Grid container direction="column" spacing={0}>
-                  <Grid item>
-                    <Typography variant="h4">Good Morning,</Typography>
-                    <Typography component="span" variant="h4">
-                      John
-                    </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Typography variant="subtitle2">Project Admin</Typography>
-                  </Grid>
-                </Grid>
+                <List
+                  sx={{ width: '100%', maxWidth: 400, bgcolor: 'background.paper' }}
+                  component="nav"
+                  aria-labelledby="nested-list-subheader"
+                  subheader={
+                    <ListSubheader component="div" id="nested-list-subheader">
+                      Dzień dobry, Jan
+                    </ListSubheader>
+                  }
+                >
+                  <ListItemButton>
+                    <ListItemIcon>
+                      <LogoutIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={<Typography variant="body2">Wyloguj</Typography>} />
+                  </ListItemButton>
+                </List>
               </ClickAwayListener>
             </Paper>
           </Fade>

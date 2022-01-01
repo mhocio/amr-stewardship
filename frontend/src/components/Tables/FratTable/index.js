@@ -36,7 +36,7 @@ export default function FratTable() {
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
         <TableHead>
-          <TableRow sx={{ background: "#F4F5F7" }}>
+          <TableRow sx={{ background: "#D6E4FC" }}>
             <TableCell rowSpan={3}>Szczep bakteryjny</TableCell>
             <TableCell rowSpan={3} align="center">%I</TableCell>
             <TableCell colSpan={2} align="center">
@@ -46,7 +46,7 @@ export default function FratTable() {
               Netilmycyna
             </TableCell>
           </TableRow>
-          <TableRow sx={{ background: "#E7EBEF" }}>
+          <TableRow sx={{ background: "#EBF2FE" }}>
             <TableCell align="center">%S</TableCell>
             <TableCell align="center">F</TableCell>
             <TableCell align="center">%S</TableCell>
@@ -60,7 +60,7 @@ export default function FratTable() {
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '&:nth-of-type(even)': {
-                  background: "#F4F5F7",
+                  background: "#EBF2FE",
                 }
               }}
             >
@@ -73,7 +73,7 @@ export default function FratTable() {
             </TableRow>
           ))}
           <TableRow sx={{                '&:nth-of-type(even)': {
-                  background: "#F4F5F7",
+                  background: "#EBF2FE",
                 } , height: 45 }}>
             <TableCell>Razem</TableCell>
             <TableCell align="center">432</TableCell>
@@ -86,7 +86,7 @@ export default function FratTable() {
               55
             </TableCell>
           </TableRow>
-          <TableRow sx={{ background: "#D1D8E1", height: 45}}>
+          <TableRow sx={{ background: "#D6E4FC", height: 45}}>
             <TableCell>F/I [%] aktywności ogólnej</TableCell>
             <TableCell align="center">432</TableCell>
             <TableCell />

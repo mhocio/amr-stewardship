@@ -1,9 +1,10 @@
-import React, { PureComponent, useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DownloadChartButton from '../../DownloadChartButton';
 import FileSaver from "file-saver";
 import Grid from '@mui/material/Grid'
 import { useCurrentPng } from "recharts-to-png";
+import { Paper } from '@mui/material';
 
 const data = [
   {
@@ -63,28 +64,30 @@ export default function RecommendationChart() {
   return (
     <Grid container direction="column" spacing={3} wrap="nowrap">
       <Grid item xs={9}>
-        <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
-          <LineChart
-            ref={myRef}
-            width={500}
-            height={300}
-            data={data} ac
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-            <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
+        <Paper sx={{ padding: '20px' }}>
+          <ResponsiveContainer width="99%" aspect={1} maxHeight={500}>
+            <LineChart
+              ref={myRef}
+              width={500}
+              height={300}
+              data={data} ac
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+            </LineChart>
+          </ResponsiveContainer>
+        </Paper>
       </Grid>
       <Grid item>
         <DownloadChartButton handle={handleDownload} />

@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { plPL } from '@mui/x-data-grid';
-import { blue, yellow } from '@mui/material/colors';
+import { blue } from '@mui/material/colors';
 import MainLayout from './components/MainLayout'
 
 import PatientsPage from './pages/PatientsPage';
@@ -24,9 +24,15 @@ const theme = createTheme({
       main: blue[900],
     },
     secondary: {
-      main: blue[100],
+      main: '#B6CEFF',
+    },
+    background: {
+      default: "#F6F9FF"
     },
   },
+  shape: {
+    borderRadius: 20,
+  }, 
 },
   plPL
 );
