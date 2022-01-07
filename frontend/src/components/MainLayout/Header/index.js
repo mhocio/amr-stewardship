@@ -1,21 +1,17 @@
 import React from 'react';
 
 //material-ui
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import Toolbar from '@mui/material/Toolbar';
-import { Typography } from '@material-ui/core';
-import MuiAppBar from '@mui/material/AppBar';
+import { AppBar, Typography, Toolbar, Grid, IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Grid } from '@material-ui/core';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import MenuIcon from '@mui/icons-material/Menu';
 
 // project imports
 import Account from './AccountChip';
 
 const drawerWidth = 240;
 
-const AppBar = styled(MuiAppBar, {
+const MyAppBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
@@ -35,7 +31,7 @@ const AppBar = styled(MuiAppBar, {
 
 export default function Header({ toggleDrawer, isOpen, isAuth }) {
   return (
-    <AppBar position="fixed" open={isOpen}>
+    <MyAppBar position="fixed" open={isOpen}>
       <Toolbar>
         {isAuth &&
           <IconButton
@@ -49,7 +45,7 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
           </IconButton>
         }
         <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Grid container spacing={1} direction="row" alignItems="center" wrap="nowrap">
+          <Grid container item direction="row" alignItems="center" wrap="nowrap">
             {!isAuth &&
               <Grid item>
                 <LocalHospitalIcon fontSize="large" />
@@ -68,6 +64,6 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
           }
         </Grid>
       </Toolbar>
-    </AppBar>
+    </MyAppBar>
   )
 }

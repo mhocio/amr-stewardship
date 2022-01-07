@@ -1,8 +1,7 @@
 import * as React from 'react';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import { Paper } from '@mui/material';
-// import { options as initialOptions } from "./options";
+
+// material-ui
+import { Paper, TextField, Autocomplete } from '@mui/material';
 
 const initialOptions = [
   { label: 'Amikacyna', value: 'amikacyna' },

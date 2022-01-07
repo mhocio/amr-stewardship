@@ -1,16 +1,17 @@
 import React from 'react';
-import { LoadingButton } from '@mui/lab';
-import { useFormikContext } from 'formik';
-import CalculateIcon from '@mui/icons-material/Calculate';
 
-const ButtonWrapper = ({ children, ...otherProps }) => {
+// material-ui
+import { LoadingButton } from '@mui/lab';
+
+// third-party
+import { useFormikContext } from 'formik';
+
+const ButtonWrapper = ({ children, loading, ...otherProps }) => {
 
   const { submitForm } = useFormikContext();
-  const [loading, setLoading] = React.useState(false);
 
   const handleSubmit = () => {
     submitForm();
-    setLoading(true);
   }
 
   const configButton = {
@@ -18,12 +19,12 @@ const ButtonWrapper = ({ children, ...otherProps }) => {
     onClick: handleSubmit,
     color: 'primary',
     size: 'large',
-    loadingPosition: 'end',
+    loadingPosition: 'end'
   }
 
   return (
     <LoadingButton {...configButton}
-    endIcon={<CalculateIcon />}
+    endIcon={otherProps.icon}
     loading={loading}>
       {children}
     </LoadingButton>

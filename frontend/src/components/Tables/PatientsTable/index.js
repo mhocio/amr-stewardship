@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react'
 import { Grid } from '@material-ui/core';
-import { Typography } from '@mui/material';
+import { Typography, Skeleton, Box } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
@@ -9,8 +9,8 @@ import { Paper } from '@mui/material';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 50 },
-  { field: 'firstName', headerName: 'Imię', width: 100 },
-  { field: 'lastName', headerName: 'Nazwisko', width: 100 },
+  { field: 'name', headerName: 'Imię', width: 100 },
+  { field: 'surname', headerName: 'Nazwisko', width: 100 },
   {
     field: 'Info',
     headerName: '',
@@ -38,19 +38,14 @@ const columns = [
   },
 ];
 
-const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon' },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei' },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime' },
-  { id: 4, lastName: 'Stark', firstName: 'Arya' },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys' },
-  { id: 6, lastName: 'Melisandre', firstName: 'Jarre', },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara' },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini' },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey' },
-];
 
-export default function PatientsTable() {
+export default function PatientsTable({ data, loading}) {
+
+  var skeletons = [];
+  for (var i = 0; i < 12; i++) {
+    skeletons.push(<Skeleton sx= {{ height: 40 }} key={i} />)
+  }
+
   return (
     <Paper sx={{ padding: '20px', paddingBottom: '70px' }}>
       <div style={{ height: '79vh', width: '100%' }}>
@@ -62,12 +57,19 @@ export default function PatientsTable() {
             <Typography variant="h5">Pacjenci</Typography>
           </Grid>
         </Grid>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          responsive={'scrollMaxHeight'}
-          hideFooter={true}
-        />
+        {loading ?
+          <Box sx={{ height: '100%' }}>
+            <Skeleton height={70} />
+            {skeletons}
+          </Box>
+          :
+          <DataGrid
+            rows={data}
+            columns={columns}
+            responsive={'scrollMaxHeight'}
+            hideFooter={true}
+          />
+        }
       </div>
     </Paper>
   );

@@ -1,10 +1,16 @@
 import React, { useCallback } from 'react';
+
+// material-ui
+import { Paper, Grid } from '@mui/material';
+
+// third-party
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import DownloadChartButton from '../../DownloadChartButton';
-import FileSaver from "file-saver";
-import Grid from '@mui/material/Grid'
 import { useCurrentPng } from "recharts-to-png";
-import { Paper } from '@mui/material';
+import FileSaver from "file-saver";
+
+// project imports
+import DownloadChartButton from '../../DownloadChartButton';
+
 
 const data = [
   {

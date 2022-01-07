@@ -1,8 +1,7 @@
 import * as React from 'react';
 
 // material-ui
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+import { Button, Stack } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download'
 
 export default function DownloadChartButton({ handle }) {

@@ -1,13 +1,7 @@
 import React from 'react'
 
 // material-ui
-import { Avatar, Typography } from '@material-ui/core'
-import { Popper, Paper, Fade, Chip } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import { Grid } from '@mui/material';
-import { Divider } from '@mui/material';
-import { List, ListItemButton, ListItemText, ListItemIcon, ListSubheader } from '@mui/material';
+import { ClickAwayListener, Popper, Paper, Fade, Chip, List, ListItemButton, ListItemText, ListItemIcon, ListSubheader, Avatar, Typography } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function AccountChip({ person }) {

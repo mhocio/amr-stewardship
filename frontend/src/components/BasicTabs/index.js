@@ -2,12 +2,7 @@ import PropTypes from 'prop-types';
 import React from "react";
 
 // material-ui
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper';
-
+import { Tabs, Tab, Box, Grid, Paper } from '@mui/material';
 
 // project imports
 import SusceptibilityChart from '../Charts/SusceptibilityChart';

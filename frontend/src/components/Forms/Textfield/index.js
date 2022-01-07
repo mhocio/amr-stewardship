@@ -1,7 +1,11 @@
 import React from 'react'
-import { Formik, Form, useField } from 'formik'
 
+// material-ui
 import { TextField } from '@mui/material'
+
+// third-party
+import { useField } from 'formik'
+
 
 const TextfieldWrapper = ({ name, ...otherProps }) => {
 
@@ -20,7 +24,7 @@ const TextfieldWrapper = ({ name, ...otherProps }) => {
   }
 
   return (
-    <TextField {...configTextField} />
+    <TextField {...configTextField} style={{minHeight: "5rem"}}/>
   )
 }
 

@@ -1,17 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import React from 'react';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 
 // material-ui
-import Autocomplete from '@mui/material/Autocomplete';
-import { Typography } from '@mui/material';
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import DateFnsUtils from '@date-io/date-fns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-import Grid from '@mui/material/Grid';
-import { Button } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 
 // project imports
 import MyDatePicker from '../Forms/DatePicker'
@@ -19,8 +11,8 @@ import AnalyzeButton from '../Forms/Button';
 import MySelect from '../Forms/Select'
 
 // dummy data
-import materials from '../data/materials.json'
-import wards from '../data/wards.json'
+import materials from '../../data/materials.json'
+import wards from '../../data/wards.json'
 
 const initialValues = {
   startDate: '',
@@ -35,8 +27,9 @@ const validationSchema = Yup.object({
   endDate: Yup.date()
     .when(
       "startDate",
-      (startDate, schema) => startDate && schema.min(startDate))
-    .required("Must enter end date"),
+      (startDate, schema) => startDate && schema.min(startDate,
+         "Data końcowa nie może poprzedzać początkowej"))
+    .required("Data końcowa jest wymagana"),
   material: Yup.string()
     .required('Badany materiał jest wymagany'),
   ward: Yup.string()
@@ -44,8 +37,6 @@ const validationSchema = Yup.object({
 })
 
 export default function FratMenu() {
-
-  const today = new Date();
 
   return (
     <Formik
@@ -93,17 +84,17 @@ export default function FratMenu() {
           </Grid>
           <Grid container item wrap="nowrap" justifyContent="flex-start" spacing={1} style={{ paddingLeft: 0 }}>
             <Grid item>
-              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+              <Button variant="outlined" size="small">
                 12 miesięcy
               </Button>
             </Grid>
             <Grid item>
-              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+              <Button variant="outlined" size="small">
                 6 miesięcy
               </Button>
             </Grid>
             <Grid item>
-              <Button style={{ textTransform: 'lowercase' }} variant="outlined" size="small">
+              <Button variant="outlined" size="small">
                 3 miesiące
               </Button>
             </Grid>

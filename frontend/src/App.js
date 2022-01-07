@@ -30,6 +30,11 @@ const theme = createTheme({
       default: "#F6F9FF"
     },
   },
+  typography: {
+    button: {
+      textTransform: 'none'
+    }
+  },
   shape: {
     borderRadius: 20,
   }, 

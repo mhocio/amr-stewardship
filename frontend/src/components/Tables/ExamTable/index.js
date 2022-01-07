@@ -1,9 +1,8 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
-import { Typography } from '@mui/material';
+import { Typography, Grid, Paper, Skeleton, Box } from '@mui/material';
 import TopicIcon from '@mui/icons-material/Topic';
-import { Grid } from '@material-ui/core';
-import Paper from '@mui/material/Paper';
+import BASE_URL from '../../../constants/BASE_URL';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 60 },
@@ -15,27 +14,15 @@ const columns = [
 
 ];
 
-const rows = [
-  { id: 1, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 2, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 3, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 4, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 5, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 6, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 7, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 8, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 9, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 10, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 11, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 12, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 13, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
-  { id: 14, bacteria: 'Snow', antibiotic: 'Jon', material: 'Krew', orderDate: '20/10/2021', susceptibility: 'Wrażliwy' },
+export default function ExamTable({ data, loading }) {
 
-];
+  var skeletons = [];
+  for (var i = 0; i < 12; i++) {
+    skeletons.push(<Skeleton key={i} />)
+  }
 
-export default function ExamTable() {
   return (
-    <Paper sx={{ padding: '20px', paddingBottom: '70px'}}>
+    <Paper sx={{ padding: '20px', paddingBottom: '70px' }}>
       <div style={{ height: 400, width: '100%' }}>
         <Grid container direction="row" alignItems="center" spacing={1} wrap="nowrap">
           <Grid item>
@@ -45,13 +32,20 @@ export default function ExamTable() {
             <Typography variant="h5">Antybiogramy</Typography>
           </Grid>
         </Grid>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          responsive={'scrollMaxHeight'}
-          hideFooter={true}
-          rowHeight={30}
-        />
+        {loading ?
+          <Box sx={{ height: '100%' }}>
+            <Skeleton height={70} />
+            {skeletons}
+          </Box>
+          :
+          <DataGrid
+            rows={data}
+            columns={columns}
+            responsive={'scrollMaxHeight'}
+            hideFooter={true}
+            rowHeight={30}
+          />
+        }
       </div>
     </Paper>
   );
