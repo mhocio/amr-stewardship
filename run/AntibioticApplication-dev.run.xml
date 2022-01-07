@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AntibioticApplication-dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="antibiotic" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.top.antibiotic.AntibioticApplication" />
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
