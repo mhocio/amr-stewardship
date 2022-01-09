@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
+import axios from 'axios';
 // material-ui
 import { styled } from '@mui/material/styles';
 import { Paper, Grid } from '@mui/material';
@@ -32,8 +32,8 @@ const PatientsPage = () => {
 
   const getTablesData = async () => {
     setLoading(true);
-    Promise.all([
-      await fetch(`${BASE_URL}/patients`, {
+    axios.all([
+      await axios.get(`${BASE_URL}/patients`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -42,7 +42,7 @@ const PatientsPage = () => {
           // 'Authorization': 'Bearer ' + authToken
         }
       }),
-      await fetch(`${BASE_URL}/antibiograms`, {
+      await axios.get(`${BASE_URL}/antibiograms`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -52,18 +52,17 @@ const PatientsPage = () => {
         }
       })
     ])
-      .then(([res1, res2]) => Promise.all([res1.json(), res2.json()]))
-      .then(([data1, data2]) => {
-        setPatients(data1);
-        setAntibiograms(data2);
-      })
+      .then(axios.spread((res1, res2) => {
+        setPatients(res1.data);
+        setAntibiograms(res2.data);
+      }))
       .catch((err) => {
         setErrorFlag(true);
         console.log(`Couldn't fetch tables data: ${err}`);
       })
       .finally(() => {
         setLoading(false);
-      })
+      });
 
   }
 

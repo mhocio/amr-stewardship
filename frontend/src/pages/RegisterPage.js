@@ -1,18 +1,22 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 
 // material-ui
-import { Paper, TextField, Button, Typography, Grid } from '@mui/material';
+import { Paper, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import PersonIcon from '@mui/icons-material/Person';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+
+// project imports
 import RegisterButton from '../components/Forms/Button';
-
 import TextfieldWrapper from '../components/Forms/Textfield';
+import BASE_URL from '../constants/BASE_URL';
 
+// third-party
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
+import axios from 'axios';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -24,13 +28,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 
-
 export default function RegisterTab(props) {
+
+  const [errorFlag, setErrorFlag] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   return (
     <>
       <DrawerHeader />
       <Formik
-        initialValues={{ email: '', password: '', passwordConfirm: '' }}
+        initialValues={{ username: '', email: '', password: '', passwordConfirm: '' }}
         validationSchema={Yup.object({
           email: Yup.string()
             .email('Niepoprawny adres email')
@@ -44,7 +51,13 @@ export default function RegisterTab(props) {
             .required('Wymagane'),
         })}
         onSubmit={values => {
-          console.log(values);
+          axios.post(`${BASE_URL}/auth/signup`, {
+              "username": values.username,
+              "email": values.email,
+              "password": values.password
+            }
+          )
+          .then(res => console.log(res.data))
         }}
       >
         <Form>

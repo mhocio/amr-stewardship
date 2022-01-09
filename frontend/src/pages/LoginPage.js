@@ -1,18 +1,22 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+// material-ui
 import { Paper, Button, Typography, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
 import PersonIcon from '@mui/icons-material/Person';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import * as Yup from 'yup';
-import { Formik, Form } from 'formik';
-
-import TextfieldWrapper from '../components/Forms/Textfield';
-import LoginButton from '../components/Forms/Button';
 import LoginIcon from '@mui/icons-material/Login';
 
+// project imports
+import TextfieldWrapper from '../components/Forms/Textfield';
+import LoginButton from '../components/Forms/Button';
 import BASE_URL from '../constants/BASE_URL';
+
+// third-party
+import * as Yup from 'yup';
+import { Formik, Form } from 'formik';
+import axios from 'axios';
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -24,10 +28,11 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 
-export default function LoginTab(props) {
+export default function LoginTab() {
 
   const [loading, setLoading] = React.useState(false);
 
+  const navigate = useNavigate();
 
   return (
     <>
@@ -40,24 +45,15 @@ export default function LoginTab(props) {
           password: Yup.string()
             .required('Wymagane')
         })}
-        onSubmit={ async (values, { setSubmitting }) => {
-          const res = await fetch(`${BASE_URL}/users`, {
-              method: 'POST',
-              mode: 'cors',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Access-Control-Allow-Origin': '*'
-              }}).then(response => response.json());
-              body: JSON.stringify({
-
-              })
-          console.log(res);
-          setTimeout(() => {
-              alert(JSON.stringify(res, null, 2));
-              setSubmitting(false);
-          }, 400);
-      }}
-  >
+        onSubmit={values => {
+          axios.post(`${BASE_URL}/auth/login`, {
+            "username": values.username,
+            "password": values.password
+          }
+          )
+           // .then(res => setAuthToken(res.data.authenticationToken))
+        }}
+      >
         <Form>
           <Grid container spacing={4} alignItems="center" justifyContent="center">
             <Paper style={{
@@ -70,7 +66,7 @@ export default function LoginTab(props) {
               </Grid>
               <Grid container item spacing={2} alignItems="center">
                 <Grid item>
-                  <PersonIcon fontSize="medium" sx={{marginBottom: "1rem"}}/>
+                  <PersonIcon fontSize="medium" sx={{ marginBottom: "1rem" }} />
                 </Grid>
                 <Grid item>
                   <TextfieldWrapper
@@ -79,7 +75,7 @@ export default function LoginTab(props) {
               </Grid>
               <Grid container item spacing={2} alignItems="center">
                 <Grid item>
-                  <VpnKeyIcon fontSize="medium" sx={{marginBottom: "1rem"}}/>
+                  <VpnKeyIcon fontSize="medium" sx={{ marginBottom: "1rem" }} />
                 </Grid>
                 <Grid item>
                   <TextfieldWrapper

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import * as dayjs from 'dayjs'
+import axios from 'axios';
 
 // material-ui
 import { Button, Grid } from '@mui/material';
@@ -53,8 +54,8 @@ export default function FratMenu() {
 
   const getDropdownData = async () => {
     setLoading(true);
-    Promise.all([
-      await fetch(`${BASE_URL}/wards`, {
+    axios.all([
+      await axios.get(`${BASE_URL}/wards`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -63,7 +64,7 @@ export default function FratMenu() {
           // 'Authorization': 'Bearer ' + authToken
         }
       }),
-      await fetch(`${BASE_URL}/materials`, {
+      await axios.get(`${BASE_URL}/materials`, {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -73,11 +74,10 @@ export default function FratMenu() {
         }
       })
     ])
-      .then(([res1, res2]) => Promise.all([res1.json(), res2.json()]))
-      .then(([data1, data2]) => {
-        setWards(data1);
-        setMaterials(data2);
-      })
+      .then(axios.spread((res1, res2) => {
+        setWards(res1.data);
+        setMaterials(res2.data);
+      }))
       .catch((err) => {
         setErrorFlag(true);
         console.log(`Couldn't fetch wards or materials: ${err}`);

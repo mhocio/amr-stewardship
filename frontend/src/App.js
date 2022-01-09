@@ -1,5 +1,5 @@
 import './styles/App.css';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Routes,
   Route,
@@ -37,7 +37,7 @@ const theme = createTheme({
   },
   shape: {
     borderRadius: 20,
-  }, 
+  },
 },
   plPL
 );
@@ -61,28 +61,29 @@ function useAuth() {
 }
 
 function App() {
+
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <MainLayout isAuth={true}>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/patients" element={<PatientsPage />} />
-            <Route path="/trends" element={<TrendsPage />} />
-            <Route path="/frat" element={<FratPage />} />
-            <Route
-              path="/private"
-              element={
-                <PrivateRoute>
-                  <Private />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </MainLayout>
-      </BrowserRouter>
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <MainLayout isAuth={true}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/patients" element={<PatientsPage />} />
+              <Route path="/trends" element={<TrendsPage />} />
+              <Route path="/frat" element={<FratPage />} />
+              <Route
+                path="/private"
+                element={
+                  <PrivateRoute>
+                    <Private />
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+          </MainLayout>
+        </BrowserRouter>
+      </ThemeProvider>
   );
 }
 
