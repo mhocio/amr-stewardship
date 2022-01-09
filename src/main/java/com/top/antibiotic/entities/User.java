@@ -2,10 +2,7 @@ package com.top.antibiotic.entities;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -18,9 +15,11 @@ import java.time.Instant;
 @NoArgsConstructor
 public class User {
     @Id
+    @Column(unique=true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(unique=true)
     @NotBlank(message = "Username is required")
     private String username;
 
@@ -28,6 +27,7 @@ public class User {
     private String password;
 
     @Email
+    @Column(unique=true)
     @NotEmpty(message = "Email is required")
     private String email;
 

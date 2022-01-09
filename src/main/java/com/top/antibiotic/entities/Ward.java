@@ -16,6 +16,7 @@ import java.time.Instant;
 @NoArgsConstructor
 public class Ward {
     @Id
+    @Column(unique=true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

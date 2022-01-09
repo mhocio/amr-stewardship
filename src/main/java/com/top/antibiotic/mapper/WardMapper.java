@@ -13,5 +13,6 @@ public interface WardMapper {
 
     @InheritInverseConfiguration
     @Mapping(target = "createdDate", expression = "java(java.time.Instant.now())")
+    @Mapping(target = "id", ignore = true)
     Ward mapDtoToWard(WardDto subredditDto);
 }
