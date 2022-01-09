@@ -6,7 +6,7 @@ import { TextField } from '@mui/material';
 // third-party
 import { useField } from 'formik';
 
-const DatePickerWrapper = (name,  props) => {
+const DatePickerWrapper = (name, props) => {
 
   const [field, meta] = useField(name);
 
@@ -17,7 +17,7 @@ const DatePickerWrapper = (name,  props) => {
     variant: 'outlined',
     fullWidth: true,
     InputLabelProps: {
-      shrink: true 
+      shrink: true
     }
 
   }

@@ -19,11 +19,11 @@ const ButtonWrapper = ({ children, loading, ...otherProps }) => {
     onClick: handleSubmit,
     color: 'primary',
     size: 'large',
-    loadingPosition: 'end'
   }
 
   return (
     <LoadingButton {...configButton}
+    loadingPosition="end"
     endIcon={otherProps.icon}
     loading={loading}>
       {children}
