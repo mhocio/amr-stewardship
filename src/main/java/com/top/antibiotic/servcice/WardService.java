@@ -27,7 +27,7 @@ public class WardService {
         Ward savedWard = wardRepository.save(
                 wardMapper.mapDtoToWard(wardDto));
 
-        wardDto.setId(savedWard.getId());
+        wardDto.setWardId(savedWard.getWardId());
         return wardDto;
     }
 
@@ -39,6 +39,7 @@ public class WardService {
                 .collect(toList());
     }
 
+    @Transactional(readOnly = true)
     public WardDto getWard(Long id) {
         Ward ward = wardRepository.findById(id)
                 .orElseThrow(() -> new AntibioticsException("No ward found with given id: " + id));

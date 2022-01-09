@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WardDto {
-    private Long wardId;
+public class AntibioticDto {
+    private Long antibioticId;
     private String name;
+    private String code;
 }

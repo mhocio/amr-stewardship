@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Data
@@ -14,16 +16,20 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Ward {
+public class Patient {
     @Id
-    @Column(unique=true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wardId;
+    private Long patientId;
+
+    @NotBlank(message = "FirstName is required")
+    private String firstName;
+
+    @NotBlank(message = "SecondName is required")
+    private String secondName;
 
     @Column(unique=true)
-    @NotBlank(message = "Ward name is required")
-    private String name;
+    @NotNull(message = "Pesel is required")
+    private String pesel;
 
     private Instant createdDate;
 }
-

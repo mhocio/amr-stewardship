@@ -14,16 +14,16 @@ import java.time.Instant;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Ward {
+public class Bacteria {
     @Id
-    @Column(unique=true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wardId;
+    private Long bacteriaId;
 
     @Column(unique=true)
-    @NotBlank(message = "Ward name is required")
+    @NotBlank(message = "Bacteria name is required")
     private String name;
+
+    private String subtype;
 
     private Instant createdDate;
 }
-

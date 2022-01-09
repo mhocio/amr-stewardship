@@ -5,11 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import javax.validation.constraints.NotBlank;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class WardDto {
-    private Long wardId;
+public class MaterialDto {
+    private Long materialId;
     private String name;
 }
