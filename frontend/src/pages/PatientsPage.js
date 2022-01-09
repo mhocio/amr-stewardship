@@ -33,21 +33,23 @@ const PatientsPage = () => {
   const getTablesData = async () => {
     setLoading(true);
     axios.all([
-      await axios.get(`${BASE_URL}/patients`, {
+      await axios.get(`${BASE_URL}/patient`, {
         method: 'GET',
         mode: 'cors',
         headers: {
           'Accept': 'application/json, text/plain',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
           // 'Authorization': 'Bearer ' + authToken
         }
       }),
-      await axios.get(`${BASE_URL}/antibiograms`, {
+      await axios.get(`${BASE_URL}/antibiogram`, {
         method: 'GET',
         mode: 'cors',
         headers: {
           'Accept': 'application/json, text/plain',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
           // 'Authorization': 'Bearer ' + authToken
         }
       })

@@ -21,7 +21,6 @@ const initialValues = {
   ward: ''
 }
 
-
 const validationSchema = Yup.object({
   startDate: Yup.date()
     .required("Data początkowa jest wymagana"),
@@ -55,21 +54,23 @@ export default function FratMenu() {
   const getDropdownData = async () => {
     setLoading(true);
     axios.all([
-      await axios.get(`${BASE_URL}/wards`, {
+      await axios.get(`${BASE_URL}/ward`, {
         method: 'GET',
         mode: 'cors',
         headers: {
           'Accept': 'application/json, text/plain',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
           // 'Authorization': 'Bearer ' + authToken
         }
       }),
-      await axios.get(`${BASE_URL}/materials`, {
+      await axios.get(`${BASE_URL}/material`, {
         method: 'GET',
         mode: 'cors',
         headers: {
           'Accept': 'application/json, text/plain',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
           // 'Authorization': 'Bearer ' + authToken
         }
       })
@@ -116,14 +117,14 @@ export default function FratMenu() {
                 <MySelect
                   name="ward"
                   label="Oddział"
-                  options={wards}
+                  options={wards.map((item, index) => <option key={index} value={item.wardId}> {item.name}</option>)}
                 />
               </Grid>
               <Grid container item xs={2} justifyContent="flex-end">
                 <MySelect
                   name="material"
                   label="Badany materiał"
-                  options={materials}
+                  options={materials.map((item, index) => <option key={index} value={item.materialId}> {item.name}</option>)}
                 />
               </Grid>
               <Grid container item xs={4} justifyContent="flex-end">
