@@ -17,7 +17,7 @@ import TrendsPage from './pages/TrendsPage';
 import FratPage from './pages/FratPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import { bool } from 'yup';
+import { AuthContext } from './context/auth';
 
 const theme = createTheme({
   palette: {
@@ -43,7 +43,7 @@ const theme = createTheme({
   plPL
 );
 
-function useAuth() {
+function isLoggedIn() {
   const user = JSON.parse(localStorage.getItem("user"));
   var ret = (user && user.authenticationToken) ? true : false;
   console.log('useAuth: ' + ret);
@@ -51,53 +51,64 @@ function useAuth() {
 }
 
 function PrivateOutlet() {
-  const auth = useAuth();
+  const auth = isLoggedIn();
   return auth ? <Outlet /> : <Navigate to="/auth" />;
 }
 
 function LoginOutlet() {
-  const auth = useAuth();
+  const auth = isLoggedIn();
   return !auth ? <Outlet /> : <Navigate to="/page" />;
 }
 
 function App() {
 
+
+  const existingUser = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState(existingUser);
+
+  const setToken = (data) => {
+    localStorage.setItem("authenticationToken", data)
+    setUser(data)
+  }
+
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <MainLayout isAuth={useAuth()}>
-          <Routes>
+    <AuthContext.Provider value={{ user, setUser: setToken }}>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <MainLayout>
+            <Routes>
 
-            <Route
-              path="/auth"
-              element={<Navigate to="/auth/login" />}
-            />
+              <Route
+                path="/auth"
+                element={<Navigate to="/auth/login" />}
+              />
 
-<Route
-              path="/page"
-              element={<Navigate to="/page/patients" />}
-            />
+              <Route
+                path="/page"
+                element={<Navigate to="/page/patients" />}
+              />
 
-            <Route path="/auth" element={<LoginOutlet />}>
-              <Route path="/auth/login" element={<LoginPage />} />
-              <Route path="/auth/register" element={<RegisterPage />} />
-            </Route>
+              <Route path="/auth" element={<LoginOutlet />}>
+                <Route path="/auth/login" element={<LoginPage />} />
+                <Route path="/auth/register" element={<RegisterPage />} />
+              </Route>
 
-            <Route path="/page" element={<PrivateOutlet />}>
-              <Route path="/page/frat" element={<FratPage />} />
-              <Route path="/page/trends" element={<TrendsPage />} />
-              <Route path="/page/patients" element={<PatientsPage />} />
-            </Route>
+              <Route path="/page" element={<PrivateOutlet />}>
+                <Route path="/page/frat" element={<FratPage />} />
+                <Route path="/page/trends" element={<TrendsPage />} />
+                <Route path="/page/patients" element={<PatientsPage />} />
+              </Route>
 
-            <Route
-              path="*"
-              element={<Navigate to="/auth" />}
-            />
+              <Route
+                path="*"
+                element={<Navigate to="/auth" />}
+              />
 
-          </Routes>
-        </MainLayout>
-      </BrowserRouter>
-    </ThemeProvider>
+            </Routes>
+          </MainLayout>
+        </BrowserRouter>
+      </ThemeProvider>
+    </AuthContext.Provider>
   );
 }
 

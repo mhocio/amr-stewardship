@@ -30,7 +30,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     }),
   );
 
-export default function MainLayout({ children, isAuth}) {
+export default function MainLayout({ children }) {
   const [open, setOpen] = React.useState(false);
 
   const toggleDrawer = () => {
@@ -40,7 +40,7 @@ export default function MainLayout({ children, isAuth}) {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-        <Header toggleDrawer={toggleDrawer} isOpen={open} isAuth={isAuth}/>
+        <Header toggleDrawer={toggleDrawer} isOpen={open}/>
         <Sidebar toggleDrawer={toggleDrawer} isOpen={open}/>
         <Main open={open}>
         {children}

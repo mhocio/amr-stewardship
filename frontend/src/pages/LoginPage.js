@@ -55,8 +55,6 @@ export default function LoginTab() {
               if (res.data.authenticationToken) {
                 localStorage.setItem("user", JSON.stringify(res.data));
               }
-
-              navigate('/page/patients');
               window.location.reload();
             })
         }}

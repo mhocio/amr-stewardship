@@ -30,7 +30,7 @@ export default function AccountChip({ person }) {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate('/login')
+    window.location.reload();
   };
 
   return (

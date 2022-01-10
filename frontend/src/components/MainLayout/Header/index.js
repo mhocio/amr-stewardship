@@ -9,6 +9,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 // project imports
 import Account from './AccountChip';
 
+import { useAuth } from '../../../context/auth';
+
 const drawerWidth = 240;
 
 const MyAppBar = styled(AppBar, {
@@ -28,16 +30,15 @@ const MyAppBar = styled(AppBar, {
   }),
 }));
 
-const getCurrentUsername = () => {
-  return JSON.parse(localStorage.getItem("user")).username;
-}
 
-export default function Header({ toggleDrawer, isOpen, isAuth }) {
+export default function Header({ toggleDrawer, isOpen }) {
+
+  const { user } = useAuth();
 
   return (
     <MyAppBar position="fixed" open={isOpen}>
       <Toolbar>
-        {isAuth &&
+        {user &&
           <IconButton
             color="inherit"
             aria-label="toggle drawer"
@@ -50,7 +51,7 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
         }
         <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center">
           <Grid container item direction="row" alignItems="center" wrap="nowrap">
-            {!isAuth &&
+            {!user &&
               <Grid item>
                 <LocalHospitalIcon fontSize="large" />
               </Grid>
@@ -63,8 +64,8 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
           </Grid>
         </Grid>
         <Grid item>
-          {isAuth &&
-            <Account person={getCurrentUsername()} />
+          {user &&
+            <Account person={user.username} />
           }
         </Grid>
       </Toolbar>
