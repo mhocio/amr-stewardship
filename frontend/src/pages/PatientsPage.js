@@ -55,6 +55,7 @@ const PatientsPage = () => {
       })
     ])
       .then(axios.spread((res1, res2) => {
+        res1.data.map((e) => { e['id'] = e.pesel; });
         setPatients(res1.data);
         setAntibiograms(res2.data);
       }))

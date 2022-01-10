@@ -8,9 +8,9 @@ import { DataGrid, GridColDef, GridApi, GridCellValue } from '@mui/x-data-grid';
 import { Paper } from '@mui/material';
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 50 },
-  { field: 'name', headerName: 'Imię', width: 100 },
-  { field: 'surname', headerName: 'Nazwisko', width: 100 },
+  { field: 'id', headerName: 'PESEL', width: 120 },
+  { field: 'firstName', headerName: 'Imię', width: 100 },
+  { field: 'secondName', headerName: 'Nazwisko', width: 100 },
   {
     field: 'Info',
     headerName: '',
