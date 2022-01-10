@@ -18,7 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 public class Antibiogram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long antibiogramId;
     private Instant createdDate;
 
     @ManyToOne(fetch = LAZY)
@@ -54,10 +54,12 @@ public class Antibiogram {
 
     private Long orderId;
     private Long testId;
+    private Long isolationId;
     private String isolationCode;
 
     private Long isolationNum;
     private String result;
     private String dailyNumber;
+    private String mode;
     private String pryw;
 }
