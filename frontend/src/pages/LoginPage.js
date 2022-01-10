@@ -51,7 +51,14 @@ export default function LoginTab() {
             "password": values.password
           }
           )
-           // .then(res => setAuthToken(res.data.authenticationToken))
+            .then(res => {
+              if (res.data.authenticationToken) {
+                localStorage.setItem("user", JSON.stringify(res.data));
+              }
+
+              navigate('/page/patients');
+              window.location.reload();
+            })
         }}
       >
         <Form>

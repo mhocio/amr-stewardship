@@ -1,5 +1,5 @@
 import './styles/App.css';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Routes,
   Route,
@@ -17,6 +17,7 @@ import TrendsPage from './pages/TrendsPage';
 import FratPage from './pages/FratPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import { bool } from 'yup';
 
 const theme = createTheme({
   palette: {
@@ -42,48 +43,36 @@ const theme = createTheme({
   plPL
 );
 
+function useAuth() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  var ret = (user && user.authenticationToken) ? true : false;
+  console.log('useAuth: ' + ret);
+  return ret;
+}
+
 function PrivateOutlet() {
   const auth = useAuth();
   return auth ? <Outlet /> : <Navigate to="/login" />;
 }
 
-function PrivateRoute({ children }) {
-  const auth = useAuth();
-  return auth ? children : <Navigate to="/login" />;
-}
-
-const Public = () => <div>public</div>;
-const Private = () => <div>private</div>;
-const Login = () => <div>login</div>;
-
-function useAuth() {
-  return true;
-}
-
 function App() {
 
   return (
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <MainLayout isAuth={true}>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/patients" element={<PatientsPage />} />
-              <Route path="/trends" element={<TrendsPage />} />
-              <Route path="/frat" element={<FratPage />} />
-              <Route
-                path="/private"
-                element={
-                  <PrivateRoute>
-                    <Private />
-                  </PrivateRoute>
-                }
-              />
-            </Routes>
-          </MainLayout>
-        </BrowserRouter>
-      </ThemeProvider>
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <MainLayout isAuth={useAuth()}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/page" element={<PrivateOutlet />}>
+              <Route path="/page/frat" element={<FratPage />} />
+              <Route path="/page/trends" element={<TrendsPage />} />
+              <Route path="/page/patients" element={<PatientsPage />} />
+            </Route>
+          </Routes>
+        </MainLayout>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

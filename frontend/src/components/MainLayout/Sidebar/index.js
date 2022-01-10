@@ -57,25 +57,25 @@ export default function Sidebar({ toggleDrawer, isOpen }) {
       </DrawerHeader>
       <Divider />
       <List>
-        <ListItem button key='Pacjenci' onClick={() => navigate('/patients')}>
+        <ListItem button key='Pacjenci' onClick={() => navigate('/page/patients')}>
           <ListItemIcon>
             <PersonIcon />
           </ListItemIcon>
           <ListItemText primary='Pacjenci' />
         </ListItem>
-        <ListItem button key='Trendy' onClick={() => navigate('/trends')}>
+        <ListItem button key='Trendy' onClick={() => navigate('/page/trends')}>
           <ListItemIcon>
             <BarChartIcon />
           </ListItemIcon>
           <ListItemText primary='Trendy' />
         </ListItem>
-        <ListItem button key='FRAT' onClick={() => navigate('/frat')}>
+        <ListItem button key='FRAT' onClick={() => navigate('/page/frat')}>
           <ListItemIcon>
             <NumbersIcon />
           </ListItemIcon>
           <ListItemText primary='FRAT' />
         </ListItem>
-        <ListItem button key='Ustawienia' onClick={() => navigate('/settings')}>
+        <ListItem button key='Ustawienia' onClick={() => navigate('/page/settings')}>
           <ListItemIcon>
             <SettingsIcon />
           </ListItemIcon>

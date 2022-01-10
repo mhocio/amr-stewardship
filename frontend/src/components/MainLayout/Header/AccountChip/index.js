@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import { ClickAwayListener, Popper, Paper, Fade, Chip, List, ListItemButton, ListItemText, ListItemIcon, ListSubheader, Avatar, Typography } from '@mui/material';
@@ -6,17 +7,19 @@ import LogoutIcon from '@mui/icons-material/Logout';
 
 export default function AccountChip({ person }) {
 
-  var initials = person.split(" ").map((x) => x[0]).join('');
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [placement, setPlacement] = React.useState();
+
+  const navigate = useNavigate();
 
   const handleClick = (newPlacement) => (event) => {
     setAnchorEl(event.currentTarget);
     setOpen((prev) => !prev);
     setPlacement(newPlacement);
   };
+
 
   const handleClose = (event) => {
     if (anchorEl.current && anchorEl.current.contains(event.target)) {
@@ -26,12 +29,13 @@ export default function AccountChip({ person }) {
   };
 
   const handleLogout = () => {
-    console.log("Logging out");
+    localStorage.removeItem("user");
+    navigate('/login')
   };
 
   return (
     <>
-      <Chip avatar={<Avatar>{initials}</Avatar>} ref={anchorEl} label={person} color="secondary" onClick={handleClick('bottom-end')} />
+      <Chip avatar={<Avatar>{person.split(" ").map((x) => x[0]).join('')}</Avatar>} ref={anchorEl} label={person} color="secondary" onClick={handleClick('bottom-end')} />
       <Popper open={open} anchorEl={anchorEl} placement={placement} transition popperOptions={{
         modifiers: [
           {
@@ -52,7 +56,7 @@ export default function AccountChip({ person }) {
                   aria-labelledby="nested-list-subheader"
                   subheader={
                     <ListSubheader component="div" id="nested-list-subheader">
-                      Dzień dobry, Jan
+                      Dzień dobry, {person}
                     </ListSubheader>
                   }
                 >
@@ -60,7 +64,7 @@ export default function AccountChip({ person }) {
                     <ListItemIcon>
                       <LogoutIcon />
                     </ListItemIcon>
-                    <ListItemText primary={<Typography variant="body2">Wyloguj</Typography>} />
+                    <ListItemText primary={<Typography variant="body2">Wyloguj</Typography>} onClick={() => handleLogout()}/>
                   </ListItemButton>
                 </List>
               </ClickAwayListener>

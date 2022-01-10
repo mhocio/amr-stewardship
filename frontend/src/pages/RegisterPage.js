@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // material-ui
 import { Paper, Typography, Grid } from '@mui/material';
@@ -33,6 +34,8 @@ export default function RegisterTab(props) {
   const [errorFlag, setErrorFlag] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   return (
     <>
       <DrawerHeader />
@@ -52,12 +55,18 @@ export default function RegisterTab(props) {
         })}
         onSubmit={values => {
           axios.post(`${BASE_URL}/auth/signup`, {
-              "username": values.username,
-              "email": values.email,
-              "password": values.password
-            }
+            "username": values.username,
+            "email": values.email,
+            "password": values.password
+          }
           )
-          .then(res => console.log(res.data))
+            .then(res => {
+              if (res.data.authenticationToken) {
+                localStorage.setItem("user", JSON.stringify(res.data));
+              }
+              
+              navigate('/login');
+            })
         }}
       >
         <Form>

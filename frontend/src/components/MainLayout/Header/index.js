@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 //material-ui
 import { AppBar, Typography, Toolbar, Grid, IconButton } from '@mui/material';
@@ -28,8 +28,12 @@ const MyAppBar = styled(AppBar, {
   }),
 }));
 
+const getCurrentUsername = () => {
+  return JSON.parse(localStorage.getItem("user")).username;
+}
 
 export default function Header({ toggleDrawer, isOpen, isAuth }) {
+
   return (
     <MyAppBar position="fixed" open={isOpen}>
       <Toolbar>
@@ -60,7 +64,7 @@ export default function Header({ toggleDrawer, isOpen, isAuth }) {
         </Grid>
         <Grid item>
           {isAuth &&
-            <Account person='Jan Kowalski' />
+            <Account person={getCurrentUsername()} />
           }
         </Grid>
       </Toolbar>

@@ -13,6 +13,7 @@ import AnalyzeButton from '../Forms/Button';
 import MySelect from '../Forms/Select'
 
 import BASE_URL from '../../constants/BASE_URL';
+import authHeader from '../../services/auth-header';
 
 const initialValues = {
   startDate: '',
@@ -51,6 +52,11 @@ export default function FratMenu() {
 
   const today = dayjs();
 
+  axios.interceptors.request.use(request => {
+    console.log('Starting Request', JSON.stringify(request, null, 2))
+    return request
+  })
+
   const getDropdownData = async () => {
     setLoading(true);
     axios.all([
@@ -60,7 +66,8 @@ export default function FratMenu() {
         headers: {
           'Accept': 'application/json, text/plain',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
+          'Access-Control-Allow-Origin': '*',
+          ...authHeader()
           // 'Authorization': 'Bearer ' + authToken
         }
       }),
@@ -70,8 +77,8 @@ export default function FratMenu() {
         headers: {
           'Accept': 'application/json, text/plain',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-          // 'Authorization': 'Bearer ' + authToken
+          'Access-Control-Allow-Origin': '*',
+          ...authHeader()
         }
       })
     ])
