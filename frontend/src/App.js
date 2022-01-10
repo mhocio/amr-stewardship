@@ -52,7 +52,12 @@ function useAuth() {
 
 function PrivateOutlet() {
   const auth = useAuth();
-  return auth ? <Outlet /> : <Navigate to="/login" />;
+  return auth ? <Outlet /> : <Navigate to="/auth" />;
+}
+
+function LoginOutlet() {
+  const auth = useAuth();
+  return !auth ? <Outlet /> : <Navigate to="/page" />;
 }
 
 function App() {
@@ -62,13 +67,33 @@ function App() {
       <BrowserRouter>
         <MainLayout isAuth={useAuth()}>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+
+            <Route
+              path="/auth"
+              element={<Navigate to="/auth/login" />}
+            />
+
+<Route
+              path="/page"
+              element={<Navigate to="/page/patients" />}
+            />
+
+            <Route path="/auth" element={<LoginOutlet />}>
+              <Route path="/auth/login" element={<LoginPage />} />
+              <Route path="/auth/register" element={<RegisterPage />} />
+            </Route>
+
             <Route path="/page" element={<PrivateOutlet />}>
               <Route path="/page/frat" element={<FratPage />} />
               <Route path="/page/trends" element={<TrendsPage />} />
               <Route path="/page/patients" element={<PatientsPage />} />
             </Route>
+
+            <Route
+              path="*"
+              element={<Navigate to="/auth" />}
+            />
+
           </Routes>
         </MainLayout>
       </BrowserRouter>

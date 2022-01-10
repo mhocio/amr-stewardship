@@ -91,7 +91,7 @@ export default function LoginTab() {
               </Grid>
               <Grid container direction="column" alignItems="center" justifyContent="center">
                 <Grid item>
-                  <LoginButton icon={<LoginIcon />}>Zaloguj</LoginButton>
+                  <LoginButton type="submit" icon={<LoginIcon />}>Zaloguj</LoginButton>
                 </Grid>
                 <Grid item>
                   <Button disableFocusRipple disableRipple variant="text" color="primary">Nie pamiętam hasła</Button>
