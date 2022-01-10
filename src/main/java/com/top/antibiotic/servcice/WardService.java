@@ -46,4 +46,12 @@ public class WardService {
 
         return wardMapper.mapWardToDto(ward);
     }
+
+    @Transactional(readOnly = true)
+    public WardDto getWard(String name) {
+        Ward ward = wardRepository.findByName(name)
+                .orElseThrow(() -> new AntibioticsException("No ward found with given name: " + name));
+
+        return wardMapper.mapWardToDto(ward);
+    }
 }

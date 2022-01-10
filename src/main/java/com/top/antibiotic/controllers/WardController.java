@@ -37,4 +37,11 @@ public class WardController {
                 .status(HttpStatus.OK)
                 .body(wardService.getWard(id));
     }
+
+    @GetMapping("/by-name/{name}")
+    public ResponseEntity<WardDto> getWard(@PathVariable String name) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(wardService.getWard(name));
+    }
 }

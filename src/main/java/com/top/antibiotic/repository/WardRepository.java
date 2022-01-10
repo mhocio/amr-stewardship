@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface WardRepository extends JpaRepository<Ward, Long> {
-    Optional<Ward> findByName(String subredditName);
+    Optional<Ward> findByName(String name);
 }

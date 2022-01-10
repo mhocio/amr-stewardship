@@ -3,8 +3,10 @@ package com.top.antibiotic.controllers;
 import com.top.antibiotic.dto.AntibiogramResponse;
 import com.top.antibiotic.dto.AntibioticDto;
 import com.top.antibiotic.entities.*;
+import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.mapper.AntibiogramMapper;
 import com.top.antibiotic.repository.*;
+import com.top.antibiotic.servcice.WardService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -13,13 +15,16 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -37,6 +42,8 @@ public class AntibiogramController {
     private final MaterialRepository materialRepository;
     private final BacteriaRepository bacteriaRepository;
     private final AntibioticRepository antibioticRepository;
+
+    private final WardService wardService;
 
     @GetMapping
     public ResponseEntity<List<AntibiogramResponse>> getAllAntibiograms() {
@@ -58,7 +65,7 @@ public class AntibiogramController {
         for (Integer i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
             log.info(i.toString());
             XSSFRow row = worksheet.getRow(i);
-            Instant date = java.time.Instant.now();
+            Instant date = Instant.now();
             DataFormatter formatter = new DataFormatter();
 
             Antibiogram antibiogram = new Antibiogram();
@@ -70,47 +77,77 @@ public class AntibiogramController {
                 items.add(formatter.formatCellValue(row.getCell(j)));
             }
 
-            Ward ward = Ward.builder()
-                    .name(items.get(0))
-                    .createdDate(date)
-                    .build();
-            Ward savedWard = wardRepository.save(ward);
-            antibiogram.setWard(savedWard);
+            if (items.get(0).isEmpty()) {
+                continue;
+            }
 
-            Patient patient = Patient.builder()
-                    .firstName(items.get(1))
-                    .secondName(items.get(2))
-                    .pesel(items.get(3))
-                    .createdDate(date)
-                    .build();
-            Patient savedPatient = patientRepository.save(patient);
-            antibiogram.setPatient(savedPatient);
+            Ward ward;
+            try {
+                ward = wardRepository.findByName(items.get(0))
+                        .orElseThrow(() -> new AntibioticsException("No ward found"));
+            } catch (Exception e) {
+                ward = wardRepository.save(Ward.builder()
+                        .name(items.get(0))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setWard(ward);
+
+            Patient patient;
+            try {
+                patient = patientRepository.findByPesel(items.get(3))
+                        .orElseThrow(() -> new AntibioticsException("No patient found"));
+            } catch (Exception e) {
+                patient = patientRepository.save(Patient.builder()
+                        .firstName(items.get(1))
+                        .secondName(items.get(2))
+                        .pesel(items.get(3))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setPatient(patient);
 
             antibiogram.setOrderDate(items.get(4));
             antibiogram.setOrderNumber(Long.parseLong(items.get(5)));
 
-            Material material = Material.builder()
-                    .name(items.get(6))
-                    .createdDate(date)
-                    .build();
-            Material savedMaterial = materialRepository.save(material);
-            antibiogram.setMaterial(savedMaterial);
+            Material material;
+            try {
+                material = materialRepository.findByName(items.get(6))
+                        .orElseThrow(() -> new AntibioticsException("No material found"));
+            } catch (Exception e) {
+                material = materialRepository.save(Material.builder()
+                        .name(items.get(6))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setMaterial(material);
 
-            Bacteria bacteria = Bacteria.builder()
-                    .name(items.get(7))
-                    .subtype(items.get(8))
-                    .createdDate(date)
-                    .build();
-            Bacteria savedBacteria = bacteriaRepository.save(bacteria);
-            antibiogram.setBacteria(savedBacteria);
 
-            Antibiotic antibiotic = Antibiotic.builder()
-                    .name(items.get(9))
-                    .code(items.get(22))
-                    .createdDate(date)
-                    .build();
-            Antibiotic savedAntibiotic = antibioticRepository.save(antibiotic);
-            antibiogram.setAntibiotic(savedAntibiotic);
+            Bacteria bacteria;
+            try {
+                bacteria = bacteriaRepository.findByName(items.get(7))
+                        .orElseThrow(() -> new AntibioticsException("No bacteria found"));
+            } catch (Exception e) {
+                bacteria = bacteriaRepository.save(Bacteria.builder()
+                        .name(items.get(7))
+                        .subtype(items.get(8))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setBacteria(bacteria);
+
+            Antibiotic antibiotic;
+            try {
+                antibiotic = antibioticRepository.findByName(items.get(9))
+                        .orElseThrow(() -> new AntibioticsException("No antibiotic found"));
+            } catch (Exception e) {
+                antibiotic = antibioticRepository.save(Antibiotic.builder()
+                        .name(items.get(9))
+                        .code(items.get(22))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setAntibiotic(antibiotic);
 
             antibiogram.setSusceptibility(items.get(10));
             antibiogram.setMic(items.get(11));

@@ -1,0 +1,26 @@
+ALTER TABLE antibiogram CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE antibiogram DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE antibiotic CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE antibiotic DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE bacteria CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE bacteria DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE material CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE material DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE patient CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE patient DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE refresh_token CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE refresh_token DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE user CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE user DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE verification_token CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE verification_token DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE ward CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE ward DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
