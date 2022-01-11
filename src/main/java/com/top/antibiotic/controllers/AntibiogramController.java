@@ -6,6 +6,8 @@ import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.mapper.AntibiogramMapper;
 import com.top.antibiotic.repository.*;
+import com.top.antibiotic.servcice.AntibiogramService;
+import com.top.antibiotic.servcice.PatientService;
 import com.top.antibiotic.servcice.WardService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +37,6 @@ import static java.util.stream.Collectors.toList;
 public class AntibiogramController {
 
     private final AntibiogramRepository antibiogramRepository;
-    private final AntibiogramMapper antibiogramMapper;
 
     private final WardRepository wardRepository;
     private final PatientRepository patientRepository;
@@ -44,15 +45,32 @@ public class AntibiogramController {
     private final AntibioticRepository antibioticRepository;
 
     private final WardService wardService;
+    private final AntibiogramService antibiogramService;
+    private final PatientService patientService;
 
     @GetMapping
     public ResponseEntity<List<AntibiogramResponse>> getAllAntibiograms() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(antibiogramRepository.findAll()
-                        .stream()
-                        .map(antibiogramMapper::mapAntibiogramToResponse)
-                        .collect(toList()));
+                .body(antibiogramService.getAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AntibiogramResponse> getById(Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(antibiogramService.getAntibiogramsById(id));
+    }
+
+    @GetMapping("/by-pesel/{pesel}")
+    public ResponseEntity<List<AntibiogramResponse>> getAllByPesel(@PathVariable String pesel) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(antibiogramService.getAllByPatient(patientRepository.
+                        findByPesel(pesel).orElseThrow(
+                                () -> new AntibioticsException("No user with pesel: " + pesel))
+                        )
+                );
     }
 
     @PostMapping("/import")
