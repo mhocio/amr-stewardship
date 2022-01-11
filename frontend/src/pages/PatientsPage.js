@@ -10,6 +10,8 @@ import ExamTable from '../components/Tables/ExamTable';
 import { margin } from '@mui/system';
 import BASE_URL from '../constants/BASE_URL';
 
+import authHeader from '../services/auth-header'
+
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -39,8 +41,8 @@ const PatientsPage = () => {
         headers: {
           'Accept': 'application/json, text/plain',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-          // 'Authorization': 'Bearer ' + authToken
+          'Access-Control-Allow-Origin': '*',
+          ...authHeader()
         }
       }),
       await axios.get(`${BASE_URL}/antibiogram`, {
@@ -49,13 +51,14 @@ const PatientsPage = () => {
         headers: {
           'Accept': 'application/json, text/plain',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-          // 'Authorization': 'Bearer ' + authToken
+          'Access-Control-Allow-Origin': '*',
+          ...authHeader()
         }
       })
     ])
       .then(axios.spread((res1, res2) => {
         res1.data.map((e) => { e['id'] = e.pesel; });
+        res2.data.map((e) => { e['id'] = e.pesel; });
         setPatients(res1.data);
         setAntibiograms(res2.data);
       }))

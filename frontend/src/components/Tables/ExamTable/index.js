@@ -5,12 +5,14 @@ import TopicIcon from '@mui/icons-material/Topic';
 import BASE_URL from '../../../constants/BASE_URL';
 
 const columns = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'bacteria', headerName: 'Drobnoustrój', width: 130 },
-  { field: 'antibiotic', headerName: 'Antybiotyk', width: 130 },
-  { field: 'material', headerName: 'Materiał', width: 130 },
-  { field: 'orderDate', headerName: 'Data zlecenia', width: 130 },
-  { field: 'susceptibility', headerName: 'Wrażliwość', width: 130 }
+  { field: 'id', headerName: 'PESEL', width: 150 },
+  { field: 'antibiogramId', headerName: 'ID antybiogramu', width: 150 },
+  { field: 'ward', headerName: 'Oddział', width: 150 },
+  { field: 'bacteria', headerName: 'Drobnoustrój', width: 200 },
+  { field: 'antibiotic', headerName: 'Antybiotyk', width: 150 },
+  { field: 'material', headerName: 'Materiał', width: 200 },
+  { field: 'orderDate', headerName: 'Data zlecenia', width: 150 },
+  { field: 'susceptibility', headerName: 'Wrażliwość', width: 100 }
 
 ];
 
