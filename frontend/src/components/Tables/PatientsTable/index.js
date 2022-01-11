@@ -6,6 +6,9 @@ import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
 import { DataGrid, GridColDef, GridApi, GridCellValue } from '@mui/x-data-grid';
 import { Paper } from '@mui/material';
+import axios from 'axios';
+import BASE_URL from '../../../constants/BASE_URL';
+import authHeader from '../../../services/auth-header';
 
 const columns = [
   { field: 'id', headerName: 'PESEL', width: 120 },
@@ -39,11 +42,28 @@ const columns = [
 ];
 
 
-export default function PatientsTable({ data, loading}) {
+export default function PatientsTable({ data, loading, handlePatientAntibiograms }) {
 
   var skeletons = [];
   for (var i = 0; i < 12; i++) {
     skeletons.push(<Skeleton sx= {{ height: 40 }} key={i} />)
+  }
+
+  const handleOnRowClick = (params) => {
+    axios.get(`${BASE_URL}/antibiogram/by-pesel/${params.row.pesel}`, {
+        method: 'GET',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json, text/plain',
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          ...authHeader()
+        }
+    })
+    .then(res => {
+      res.data.map((e) => { e['id'] = e.antibiogramId; });
+      handlePatientAntibiograms(res.data);
+    })
   }
 
   return (
@@ -68,6 +88,7 @@ export default function PatientsTable({ data, loading}) {
             columns={columns}
             responsive={'scrollMaxHeight'}
             hideFooter={true}
+            onRowClick={handleOnRowClick}
           />
         }
       </div>

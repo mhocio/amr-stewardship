@@ -27,6 +27,11 @@ const PatientsPage = () => {
   const [antibiograms, setAntibiograms] = useState([]);
   const [errorFlag, setErrorFlag] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [patientAntibiograms, setPatientAntibiograms] = useState([]);
+
+  const handlePatientAntibiograms = (params) => {
+    setAntibiograms(params);
+  }
 
   useEffect(() => {
     getTablesData();
@@ -58,7 +63,7 @@ const PatientsPage = () => {
     ])
       .then(axios.spread((res1, res2) => {
         res1.data.map((e) => { e['id'] = e.pesel; });
-        res2.data.map((e) => { e['id'] = e.pesel; });
+        res2.data.map((e) => { e['id'] = e.antibiogramId; });
         setPatients(res1.data);
         setAntibiograms(res2.data);
       }))
@@ -77,10 +82,10 @@ const PatientsPage = () => {
       <DrawerHeader />
       <Grid container spacing={2}>
         <Grid item xs={3.5}>
-          <PatientsTable data={patients} loading={loading} />
+          <PatientsTable data={patients} loading={loading} handlePatientAntibiograms={handlePatientAntibiograms} />
         </Grid>
         <Grid item xs={8.5}>
-          <ExamTable data={antibiograms} loading={loading} />
+          <ExamTable data={antibiograms} loading={loading}/>
         </Grid>
       </Grid>
     </>

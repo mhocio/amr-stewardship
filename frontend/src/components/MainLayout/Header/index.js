@@ -38,7 +38,7 @@ export default function Header({ toggleDrawer, isOpen }) {
   return (
     <MyAppBar position="fixed" open={isOpen}>
       <Toolbar>
-        {user &&
+        {user ?
           <IconButton
             color="inherit"
             aria-label="toggle drawer"
@@ -48,19 +48,15 @@ export default function Header({ toggleDrawer, isOpen }) {
           >
             <MenuIcon />
           </IconButton>
+        :
+            <LocalHospitalIcon 
+            sx={{ mr: 3 }} />
         }
-        <Grid container spacing={2} direction="row" justifyContent="space-between" alignItems="center">
+        <Grid container direction="row" justifyContent="space-between" alignItems="center">
           <Grid container item direction="row" alignItems="center" wrap="nowrap">
-            {!user &&
-              <Grid item>
-                <LocalHospitalIcon fontSize="large" />
-              </Grid>
-            }
-            <Grid item>
               <Typography variant="h6" noWrap component="div">
                 System do zarządzania antybiotykoterapią
               </Typography>
-            </Grid>
           </Grid>
         </Grid>
         <Grid item>

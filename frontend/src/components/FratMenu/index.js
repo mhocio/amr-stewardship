@@ -68,7 +68,6 @@ export default function FratMenu() {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           ...authHeader()
-          // 'Authorization': 'Bearer ' + authToken
         }
       }),
       await axios.get(`${BASE_URL}/material`, {
