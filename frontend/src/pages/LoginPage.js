@@ -32,8 +32,6 @@ export default function LoginTab() {
 
   const [loading, setLoading] = React.useState(false);
 
-  const navigate = useNavigate();
-
   return (
     <>
       <DrawerHeader />

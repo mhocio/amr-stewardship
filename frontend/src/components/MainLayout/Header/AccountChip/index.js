@@ -5,14 +5,21 @@ import { useNavigate } from 'react-router-dom';
 import { ClickAwayListener, Popper, Paper, Fade, Chip, List, ListItemButton, ListItemText, ListItemIcon, ListSubheader, Avatar, Typography } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
-export default function AccountChip({ person }) {
 
+import { useAuth } from '../../../../context/auth'
+import BASE_URL from '../../../../constants/BASE_URL';
+
+// third-party
+import axios from 'axios';
+
+export default function AccountChip({ person }) {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [placement, setPlacement] = React.useState();
 
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleClick = (newPlacement) => (event) => {
     setAnchorEl(event.currentTarget);
@@ -29,8 +36,16 @@ export default function AccountChip({ person }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.reload();
+    axios.post(`${BASE_URL}/auth/logout`, {
+      "refreshToken": user.refreshToken,
+      "username": user.username
+    }
+    )
+      .then(res => {
+        console.log(res);
+        localStorage.removeItem("user");
+        window.location.reload();
+      })
   };
 
   return (
@@ -64,7 +79,7 @@ export default function AccountChip({ person }) {
                     <ListItemIcon>
                       <LogoutIcon />
                     </ListItemIcon>
-                    <ListItemText primary={<Typography variant="body2">Wyloguj</Typography>} onClick={() => handleLogout()}/>
+                    <ListItemText primary={<Typography variant="body2">Wyloguj</Typography>} onClick={() => handleLogout()} />
                   </ListItemButton>
                 </List>
               </ClickAwayListener>

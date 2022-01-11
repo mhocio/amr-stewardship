@@ -25,6 +25,7 @@ const ButtonWrapper = ({ children, loading, ...otherProps }) => {
     <LoadingButton {...configButton}
     loadingPosition="end"
     endIcon={otherProps.icon}
+    type="submit"
     loading={loading}>
       {children}
     </LoadingButton>
