@@ -8,6 +8,8 @@ import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import PersonIcon from '@mui/icons-material/Person';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 // project imports
 import RegisterButton from '../components/Forms/Button';
@@ -18,6 +20,10 @@ import BASE_URL from '../constants/BASE_URL';
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import axios from 'axios';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -64,7 +70,6 @@ export default function RegisterTab(props) {
               if (res.data.authenticationToken) {
                 localStorage.setItem("user", JSON.stringify(res.data));
               }
-              
               navigate('/login');
             })
         }}

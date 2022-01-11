@@ -31,6 +31,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function LoginTab() {
 
   const [loading, setLoading] = React.useState(false);
+  const nagivate = useNavigate();
 
   return (
     <>
@@ -88,6 +89,9 @@ export default function LoginTab() {
               <Grid container direction="column" alignItems="center" justifyContent="center">
                 <Grid item>
                   <LoginButton type="submit" icon={<LoginIcon />}>Zaloguj</LoginButton>
+                </Grid>
+                <Grid item sx={{marginTop: "15px"}}>
+                  <Button disableFocusRipple disableRipple variant="text" color="primary" onClick={() => nagivate('/auth/register')}>Nie mam konta</Button>
                 </Grid>
                 <Grid item>
                   <Button disableFocusRipple disableRipple variant="text" color="primary">Nie pamiętam hasła</Button>
