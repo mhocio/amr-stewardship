@@ -4,6 +4,7 @@ import com.top.antibiotic.dto.AuthenticationResponse;
 import com.top.antibiotic.dto.LoginRequest;
 import com.top.antibiotic.dto.RefreshTokenRequest;
 import com.top.antibiotic.dto.RegisterRequest;
+import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.servcice.AuthService;
 import com.top.antibiotic.servcice.RefreshTokenService;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @RestController
 @RequestMapping("api/auth")
@@ -25,9 +27,17 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@Valid @RequestBody RegisterRequest registerRequest) {
-        authService.signup(registerRequest);
-        return new ResponseEntity<>("User Registration Successful",
-                HttpStatus.OK);
+        try {
+            authService.signup(registerRequest);
+            return new ResponseEntity<>("User Registration Successful",
+                    HttpStatus.OK);
+        } catch (AntibioticsException ae) {
+            return new ResponseEntity<>(ae.getMessage(),
+                    HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("error creating user",
+                    HttpStatus.CONFLICT);
+        }
     }
 
     @GetMapping("accountVerification/{token}")

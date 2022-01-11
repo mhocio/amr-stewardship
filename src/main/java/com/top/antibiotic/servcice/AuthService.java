@@ -12,6 +12,7 @@ import com.top.antibiotic.repository.UserRepository;
 import com.top.antibiotic.repository.VerificationTokenRepository;
 import com.top.antibiotic.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 @Transactional
+@Slf4j
 public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
@@ -39,13 +41,23 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
-    public void signup(RegisterRequest registerRequest) {
+    public void signup(RegisterRequest registerRequest) throws AntibioticsException {
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setCreatedDate(Instant.now());
         user.setEnabled(false);
+
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
+            throw new AntibioticsException("User already exists with username: "
+                + registerRequest.getUsername());
+        }
+
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
+            throw new AntibioticsException("User already exists with email: "
+                    + registerRequest.getEmail());
+        }
 
         userRepository.save(user);
 
