@@ -62,7 +62,6 @@ function LoginOutlet() {
 
 function App() {
 
-
   const existingUser = JSON.parse(localStorage.getItem("user"));
   const [user, setUser] = useState(existingUser);
 
