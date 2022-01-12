@@ -30,6 +30,10 @@ public class Antibiogram {
     private Patient patient;
 
     private String orderDate;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "examinationId", referencedColumnName = "examinationId")
+    //            ,insertable = false, updatable = false)
+    private Examination examination;
     private Long orderNumber;
 
     @ManyToOne(fetch = LAZY)

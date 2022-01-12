@@ -43,6 +43,7 @@ public class AntibiogramController {
     private final MaterialRepository materialRepository;
     private final BacteriaRepository bacteriaRepository;
     private final AntibioticRepository antibioticRepository;
+    private final ExaminationRepository examinationRepository;
 
     private final WardService wardService;
     private final AntibiogramService antibiogramService;
@@ -140,7 +141,6 @@ public class AntibiogramController {
             }
             antibiogram.setMaterial(material);
 
-
             Bacteria bacteria;
             try {
                 bacteria = bacteriaRepository.findByName(items.get(7))
@@ -166,6 +166,20 @@ public class AntibiogramController {
                         .build());
             }
             antibiogram.setAntibiotic(antibiotic);
+
+            Examination examination;
+            try {
+                examination = examinationRepository.findByNumber(Long.parseLong(items.get(5)))
+                        .orElseThrow(() -> new AntibioticsException("No Order found"));
+            } catch (Exception e) {
+                examination = examinationRepository.save(Examination.builder()
+                        .number(Long.parseLong(items.get(5)))
+                        .ward(ward)
+                        .material(material)
+                        .patient(patient)
+                        .build());
+            }
+            antibiogram.setExamination(examination);
 
             antibiogram.setSusceptibility(items.get(10));
             antibiogram.setMic(items.get(11));

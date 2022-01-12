@@ -24,3 +24,6 @@ ALTER TABLE verification_token DEFAULT CHARACTER SET utf8 COLLATE utf8_general_c
 
 ALTER TABLE ward CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
 ALTER TABLE ward DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+ALTER TABLE examination CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;
+ALTER TABLE examination DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
