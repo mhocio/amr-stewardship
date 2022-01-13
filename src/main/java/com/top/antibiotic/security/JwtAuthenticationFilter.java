@@ -1,5 +1,7 @@
 package com.top.antibiotic.security;
 
+import com.top.antibiotic.exceptions.InvalidRefreshTokenException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -30,17 +33,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String jwt = getJwtFromRequest(request);
 
-        if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
-            String username = jwtProvider.getUsernameFromJwt(jwt);
+        try {
+            if (StringUtils.hasText(jwt) && jwtProvider.validateToken(jwt)) {
+                String username = jwtProvider.getUsernameFromJwt(jwt);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
-                    null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+                        null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            filterChain.doFilter(request, response);
+        } catch (io.jsonwebtoken.ExpiredJwtException expiredJwtException) {
+            response.setStatus(401);
+        } catch (Exception ex) {
+            if (ex.getCause().getClass() == InvalidRefreshTokenException.class) {
+                response.setStatus(403);
+            } else {
+                response.setStatus(404);
+            }
         }
-        filterChain.doFilter(request, response);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {

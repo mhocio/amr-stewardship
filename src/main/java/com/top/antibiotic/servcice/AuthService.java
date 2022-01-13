@@ -8,6 +8,7 @@ import com.top.antibiotic.dto.RegisterRequest;
 import com.top.antibiotic.entities.User;
 import com.top.antibiotic.entities.VerificationToken;
 import com.top.antibiotic.exceptions.AntibioticsException;
+import com.top.antibiotic.exceptions.InvalidRefreshTokenException;
 import com.top.antibiotic.repository.UserRepository;
 import com.top.antibiotic.repository.VerificationTokenRepository;
 import com.top.antibiotic.security.JwtProvider;
@@ -120,7 +121,7 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
     }
 
-    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) throws InvalidRefreshTokenException {
         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
         String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
 

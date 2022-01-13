@@ -14,6 +14,6 @@ import java.util.List;
 public class FratTableResponse {
     public List<String> antibiotics;
     public List<String> bacterias;
-    public List<String> rows;
+    public List<List<String>> rows;
     public List<String> results;
 }
