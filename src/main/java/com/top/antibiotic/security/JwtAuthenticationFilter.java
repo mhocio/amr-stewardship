@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (ex.getCause().getClass() == InvalidRefreshTokenException.class) {
                 response.setStatus(403);
             } else {
-                response.setStatus(404);
+                throw ex;
             }
         }
     }

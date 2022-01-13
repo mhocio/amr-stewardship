@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Date;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -29,7 +30,7 @@ public class Antibiogram {
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Patient patient;
 
-    private String orderDate;
+    private Date orderDate;
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "examinationId", referencedColumnName = "examinationId")
     //            ,insertable = false, updatable = false)

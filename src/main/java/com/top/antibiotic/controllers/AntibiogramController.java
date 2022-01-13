@@ -23,8 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,7 +78,7 @@ public class AntibiogramController {
     }
 
     @PostMapping("/import")
-    public void mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException {
+    public void mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, ParseException {
 
         List<Antibiogram> tempStudentList = new ArrayList<Antibiogram>();
         XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
@@ -126,7 +129,11 @@ public class AntibiogramController {
             }
             antibiogram.setPatient(patient);
 
-            antibiogram.setOrderDate(items.get(4));
+            String pattern = "MM/dd/yy";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            Date dateInserted = simpleDateFormat.parse(items.get(4));
+            antibiogram.setOrderDate(dateInserted);
+
             antibiogram.setOrderNumber(Long.parseLong(items.get(5)));
 
             Material material;
