@@ -31,6 +31,7 @@ const StyledTableRow = styled('TableRow')({
   },
 });
 
+
 export default function FratTable() {
   return (
     <TableContainer component={Paper}>

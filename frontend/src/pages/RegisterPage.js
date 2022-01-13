@@ -8,28 +8,18 @@ import AlternateEmailIcon from "@mui/icons-material/AlternateEmail";
 import PersonIcon from "@mui/icons-material/Person";
 import AppRegistrationIcon from "@mui/icons-material/AppRegistration";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
 
 // project imports
 import RegisterButton from "../components/Forms/Button";
 import TextfieldWrapper from "../components/Forms/Textfield";
 import BASE_URL from "../constants/BASE_URL";
+import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
 
 // third-party
 import * as Yup from "yup";
 import { Formik, Form } from "formik";
 import axios from "axios";
 import { useSnackbar } from "notistack";
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end"
-}));
 
 export default function RegisterTab(props) {
   const [errorFlag, setErrorFlag] = useState(false);
@@ -77,11 +67,9 @@ export default function RegisterTab(props) {
               navigate("/login");
             })
             .catch(function (error) {
-              if (error.response) {
-                console.log(error.response.data);
-                console.log(error.response.status);
-                console.log(error.response.headers);
-              }
+              enqueueSnackbar(error.response.data, {
+                variant: "error"
+              });
             });
         }}
       >

@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Grid } from '@material-ui/core';
 import { Typography, Skeleton, Box } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
-import { DataGrid, GridColDef, GridApi, GridCellValue } from '@mui/x-data-grid';
 import { Paper } from '@mui/material';
 import axios from 'axios';
 import BASE_URL from '../../../constants/BASE_URL';
 import authHeader from '../../../services/auth-header';
+import { StyledDataGrid } from "../../../styledComponents/StyledDataGrid";
 
 const columns = [
   { field: 'id', headerName: 'PESEL', width: 120 },
@@ -83,7 +83,7 @@ export default function PatientsTable({ data, loading, handlePatientAntibiograms
             {skeletons}
           </Box>
           :
-          <DataGrid
+          <StyledDataGrid
             rows={data}
             columns={columns}
             responsive={'scrollMaxHeight'}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios';
 // material-ui
 import { styled } from '@mui/material/styles';
 import { Paper, Grid } from '@mui/material';
@@ -9,17 +8,10 @@ import PatientsTable from '../components/Tables/PatientsTable';
 import ExamTable from '../components/Tables/ExamTable';
 import { margin } from '@mui/system';
 import BASE_URL from '../constants/BASE_URL';
+import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
+import axios from '../services/interceptor';
 
 import authHeader from '../services/auth-header'
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
-}));
 
 const PatientsPage = () => {
 
@@ -27,7 +19,6 @@ const PatientsPage = () => {
   const [antibiograms, setAntibiograms] = useState([]);
   const [errorFlag, setErrorFlag] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [patientAntibiograms, setPatientAntibiograms] = useState([]);
 
   const handlePatientAntibiograms = (params) => {
     setAntibiograms(params);

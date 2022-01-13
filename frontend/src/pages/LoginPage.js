@@ -12,21 +12,12 @@ import LoginIcon from '@mui/icons-material/Login';
 import TextfieldWrapper from '../components/Forms/Textfield';
 import LoginButton from '../components/Forms/Button';
 import BASE_URL from '../constants/BASE_URL';
+import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
 
 // third-party
 import * as Yup from 'yup';
 import { Formik, Form } from 'formik';
 import axios from 'axios';
-
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
-}));
-
 
 export default function LoginTab() {
 
