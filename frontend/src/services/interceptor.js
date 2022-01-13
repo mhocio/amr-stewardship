@@ -3,6 +3,8 @@ import BASE_URL from "../constants/BASE_URL";
 
 axios.interceptors.response.use(null, (error) => {
   if (
+    error &&
+    error.response &&
     error.config &&
     error.response.status === 401 && // change if necessary
     !error.config.__isRetry
@@ -51,6 +53,9 @@ const refreshToken = (axios, config) => {
       })
       .catch((err) => {
         console.log(err);
+        localStorage.removeItem("user");
+        // TODO: redirect to login
+        return reject(err);
       });
   });
 };
