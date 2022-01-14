@@ -54,7 +54,7 @@ const refreshToken = (axios, config) => {
       .catch((err) => {
         console.log(err);
         localStorage.removeItem("user");
-        // TODO: redirect to login
+        window.location.reload();
         return reject(err);
       });
   });
