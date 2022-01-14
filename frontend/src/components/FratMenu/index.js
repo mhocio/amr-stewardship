@@ -14,6 +14,7 @@ import MySelect from "../Forms/Select";
 
 import BASE_URL from "../../constants/BASE_URL";
 import authHeader from "../../services/auth-header";
+import { useLoading } from "../../loading/loading-context";
 
 const initialValues = {
   startDate: "",
@@ -40,9 +41,7 @@ export default function FratMenu({ handleSetFratData }) {
   const [wards, setWards] = useState([]);
   const [materials, setMaterials] = useState([]);
   const [errorFlag, setErrorFlag] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const { loading, setLoading } = useLoading();
 
   useEffect(() => {
     getDropdownData();
@@ -56,7 +55,6 @@ export default function FratMenu({ handleSetFratData }) {
   });
 
   const getDropdownData = async () => {
-    setLoading(true);
     axios
       .all([
         await axios.get(`${BASE_URL}/ward`, {
@@ -89,9 +87,6 @@ export default function FratMenu({ handleSetFratData }) {
       .catch((err) => {
         setErrorFlag(true);
         console.log(`Couldn't fetch wards or materials: ${err}`);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
 
@@ -102,7 +97,7 @@ export default function FratMenu({ handleSetFratData }) {
       validateOnBlur={false}
       validateOnChange
       onSubmit={(values) => {
-        
+        setLoading(true);
         axios
           .get(`${BASE_URL}/frat-table/${values.ward}/${values.material}`, {
             method: "GET",
@@ -118,6 +113,9 @@ export default function FratMenu({ handleSetFratData }) {
           .then((res) => {
             console.log(res.data)
             handleSetFratData(res.data)
+          })
+          .finally(() => {
+            setLoading(false);
           });
       }}
     >

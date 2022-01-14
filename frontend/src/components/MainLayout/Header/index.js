@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 //material-ui
-import { AppBar, Typography, Toolbar, Grid, IconButton } from '@mui/material';
+import { AppBar, Typography, Toolbar, Grid, IconButton, LinearProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -10,6 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Account from './AccountChip';
 
 import { useAuth } from '../../../context/auth';
+import { useLoading } from "../../../loading/loading-context";
 
 const drawerWidth = 240;
 
@@ -33,9 +34,11 @@ const MyAppBar = styled(AppBar, {
 
 export default function Header({ toggleDrawer, isOpen }) {
 
+  const { loading, setLoading } = useLoading();
   const { user } = useAuth();
 
   return (
+    <>
     <MyAppBar position="fixed" open={isOpen}>
       <Toolbar>
         {user ?
@@ -65,6 +68,9 @@ export default function Header({ toggleDrawer, isOpen }) {
           }
         </Grid>
       </Toolbar>
+      {loading && <LinearProgress/>}
     </MyAppBar>
+    </>
+    
   )
 }

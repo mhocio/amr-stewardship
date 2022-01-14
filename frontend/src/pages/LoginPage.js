@@ -13,6 +13,7 @@ import TextfieldWrapper from '../components/Forms/Textfield';
 import LoginButton from '../components/Forms/Button';
 import BASE_URL from '../constants/BASE_URL';
 import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
+import { useLoading } from "../loading/loading-context";
 
 // third-party
 import * as Yup from 'yup';
@@ -21,7 +22,7 @@ import axios from 'axios';
 
 export default function LoginTab() {
 
-  const [loading, setLoading] = React.useState(false);
+  const { loading, setLoading } = useLoading();
   const nagivate = useNavigate();
 
   return (
@@ -36,6 +37,7 @@ export default function LoginTab() {
             .required('Wymagane')
         })}
         onSubmit={values => {
+          setLoading(true);
           axios.post(`${BASE_URL}/auth/login`, {
             "username": values.username,
             "password": values.password
@@ -45,6 +47,7 @@ export default function LoginTab() {
               if (res.data.authenticationToken) {
                 localStorage.setItem("user", JSON.stringify(res.data));
               }
+              setLoading(false);
               window.location.reload();
             })
         }}

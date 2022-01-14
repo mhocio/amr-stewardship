@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 // material-ui
-import { styled } from '@mui/material/styles';
-import { Paper, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 
 // project imports
 import PatientsTable from '../components/Tables/PatientsTable';
 import ExamTable from '../components/Tables/ExamTable';
-import { margin } from '@mui/system';
 import BASE_URL from '../constants/BASE_URL';
 import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
 import axios from '../services/interceptor';
+
+import { useLoading } from "../loading/loading-context";
 
 import authHeader from '../services/auth-header'
 
@@ -18,7 +18,7 @@ const PatientsPage = () => {
   const [patients, setPatients] = useState([]);
   const [antibiograms, setAntibiograms] = useState([]);
   const [errorFlag, setErrorFlag] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const { loading, setLoading } = useLoading();
 
   const handlePatientAntibiograms = (params) => {
     setAntibiograms(params);

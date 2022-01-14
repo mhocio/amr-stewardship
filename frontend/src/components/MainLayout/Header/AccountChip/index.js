@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ClickAwayListener, Popper, Paper, Fade, Chip, List, ListItemButton, ListItemText, ListItemIcon, ListSubheader, Avatar, Typography } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 
-
+// project imports
 import { useAuth } from '../../../../context/auth'
 import BASE_URL from '../../../../constants/BASE_URL';
 

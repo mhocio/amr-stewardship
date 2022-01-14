@@ -8,7 +8,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material";
 
-
 const StyledTableRow = styled("TableRow")({
   root: {
     "&:nth-of-type(odd)": {
@@ -21,9 +20,14 @@ const StyledTableRow = styled("TableRow")({
 });
 
 export default function FratTable({ fratData }) {
+
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+      <Table
+        sx={{ minWidth: 650, overflowX: "auto" }}
+        size="small"
+        aria-label="a dense table"
+      >
         <TableHead>
           <TableRow sx={{ background: "#D6E4FC" }}>
             <TableCell rowSpan={3}>Szczep bakteryjny</TableCell>
@@ -40,10 +44,12 @@ export default function FratTable({ fratData }) {
           </TableRow>
           <TableRow sx={{ background: "#EBF2FE" }}>
             {fratData?.antibiotics?.map((item, i) => {
-              return (<>
-                <TableCell align="center">%S</TableCell>
-                <TableCell align="center">F</TableCell>
-              </>);
+              return (
+                <>
+                  <TableCell align="center">%S</TableCell>
+                  <TableCell align="center">F</TableCell>
+                </>
+              );
             })}
           </TableRow>
         </TableHead>

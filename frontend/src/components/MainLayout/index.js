@@ -2,7 +2,7 @@ import * as React from 'react';
 
 // material-ui
 import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+import { Box, LinearProgress }from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 
 // project imports
