@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ExaminationRepository extends JpaRepository<Examination, Long> {
+    boolean existsByNumber(Long number);
     Optional<Examination> findByNumber(Long number);
     List<Examination> findByPatient(Patient patient);
     List<Examination> findByMaterial(Material material);

@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import java.util.Date;
 import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
@@ -37,6 +38,8 @@ public class Examination {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Patient patient;
+
+    private Date orderDate;
 
     @OneToMany(fetch = LAZY, mappedBy = "examination")
     private List<Antibiogram> antibiograms;

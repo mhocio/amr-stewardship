@@ -1,17 +1,25 @@
 package com.top.antibiotic.servcice;
 
 import com.top.antibiotic.dto.AntibiogramResponse;
-import com.top.antibiotic.entities.Antibiogram;
-import com.top.antibiotic.entities.Patient;
+import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.mapper.AntibiogramMapper;
-import com.top.antibiotic.repository.AntibiogramRepository;
+import com.top.antibiotic.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +27,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AntibiogramService {
     // TODO
+    private final WardRepository wardRepository;
+    private final PatientRepository patientRepository;
+    private final MaterialRepository materialRepository;
+    private final BacteriaRepository bacteriaRepository;
+    private final AntibioticRepository antibioticRepository;
+    private final ExaminationRepository examinationRepository;
+
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
 
@@ -44,5 +59,149 @@ public class AntibiogramService {
                 .stream()
                 .map(antibiogramMapper::mapAntibiogramToResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional()
+    public void saveFromFile(MultipartFile reapExcelDataFile) throws IOException, ParseException {
+
+        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+        XSSFSheet worksheet = workbook.getSheetAt(2);
+
+        // whether we insert this new Examination number this time
+        Set<Long> newExaminationNumbers = new HashSet<Long>();
+
+        for (Integer i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+
+            log.info(i.toString());
+            XSSFRow row = worksheet.getRow(i);
+            Instant date = Instant.now();
+            DataFormatter formatter = new DataFormatter();
+
+            Antibiogram antibiogram = new Antibiogram();
+            antibiogram.setCreatedDate(date);
+
+            String s = formatter.formatCellValue(row.getCell(1));
+            List<String> items = new ArrayList<>();
+            for (int j = 0; j <= 26 ; j++) {
+                items.add(formatter.formatCellValue(row.getCell(j)));
+            }
+
+            if (items.get(0).isEmpty()) {
+                continue;
+            }
+
+            // do not proceed if sb previously pushed this file or file with this Examination
+            if (!examinationRepository.existsByNumber(Long.parseLong(items.get(5)))) {
+                newExaminationNumbers.add(Long.parseLong(items.get(5)));
+            }
+            if (!newExaminationNumbers.contains(Long.parseLong(items.get(5)))) {
+                continue;
+            }
+
+            Ward ward;
+            try {
+                ward = wardRepository.findByName(items.get(0))
+                        .orElseThrow(() -> new AntibioticsException("No ward found"));
+            } catch (Exception e) {
+                ward = wardRepository.save(Ward.builder()
+                        .name(items.get(0))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setWard(ward);
+
+            Patient patient;
+            try {
+                patient = patientRepository.findByPesel(items.get(3))
+                        .orElseThrow(() -> new AntibioticsException("No patient found"));
+            } catch (Exception e) {
+                patient = patientRepository.save(Patient.builder()
+                        .firstName(items.get(1))
+                        .secondName(items.get(2))
+                        .pesel(items.get(3))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setPatient(patient);
+
+            String pattern = "MM/dd/yy";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            Date dateInserted = simpleDateFormat.parse(items.get(4));
+            antibiogram.setOrderDate(dateInserted);
+
+            antibiogram.setOrderNumber(Long.parseLong(items.get(5)));
+
+            Material material;
+            try {
+                material = materialRepository.findByName(items.get(6))
+                        .orElseThrow(() -> new AntibioticsException("No material found"));
+            } catch (Exception e) {
+                material = materialRepository.save(Material.builder()
+                        .name(items.get(6))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setMaterial(material);
+
+            Bacteria bacteria;
+            try {
+                bacteria = bacteriaRepository.findByName(items.get(7))
+                        .orElseThrow(() -> new AntibioticsException("No bacteria found"));
+            } catch (Exception e) {
+                bacteria = bacteriaRepository.save(Bacteria.builder()
+                        .name(items.get(7))
+                        .subtype(items.get(8))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setBacteria(bacteria);
+
+            Antibiotic antibiotic;
+            try {
+                antibiotic = antibioticRepository.findByName(items.get(9))
+                        .orElseThrow(() -> new AntibioticsException("No antibiotic found"));
+            } catch (Exception e) {
+                antibiotic = antibioticRepository.save(Antibiotic.builder()
+                        .name(items.get(9))
+                        .code(items.get(22))
+                        .createdDate(date)
+                        .build());
+            }
+            antibiogram.setAntibiotic(antibiotic);
+
+            Examination examination;
+            try {
+                examination = examinationRepository.findByNumber(Long.parseLong(items.get(5)))
+                        .orElseThrow(() -> new AntibioticsException("No Order found"));
+            } catch (Exception e) {
+                examination = examinationRepository.save(Examination.builder()
+                        .number(Long.parseLong(items.get(5)))
+                        .ward(ward)
+                        .material(material)
+                        .patient(patient)
+                        .orderDate(dateInserted)
+                        .build());
+            }
+            antibiogram.setExamination(examination);
+
+            antibiogram.setSusceptibility(items.get(10));
+            antibiogram.setMic(items.get(11));
+            antibiogram.setAlert(Boolean.parseBoolean(items.get(12)));
+            antibiogram.setPatogen(Boolean.parseBoolean(items.get(13)));
+            antibiogram.setGrowth(items.get(14));
+            antibiogram.setFirstIsolate(Boolean.parseBoolean(items.get(15)));
+            antibiogram.setHospitalInfection(Boolean.parseBoolean(items.get(16)));
+            antibiogram.setOrderId(Long.parseLong(items.get(17)));
+            antibiogram.setTestId(Long.parseLong(items.get(18)));
+            antibiogram.setIsolationId(Long.parseLong(items.get(19)));
+            antibiogram.setIsolationCode(items.get(20));
+            antibiogram.setIsolationNum(Long.parseLong(items.get(21)));
+            antibiogram.setResult(items.get(23));
+            antibiogram.setDailyNumber(items.get(24));
+            antibiogram.setMode(items.get(25));
+            antibiogram.setPryw(items.get(26));
+
+            Antibiogram savedAntibiogram = antibiogramRepository.save(antibiogram);
+        }
     }
 }
