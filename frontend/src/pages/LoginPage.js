@@ -51,12 +51,12 @@ export default function LoginTab() {
               setLoading(false);
               window.location.reload();
             })
-            .name.catch(function (error) {
+            .catch((error) => {
               setLoading(false);
-              enqueueSnackbar(error.response.data, {
+              enqueueSnackbar(error.response.data.message, {
                 variant: "error"
               });
-            });
+            })
         }}
       >
         <Form>
