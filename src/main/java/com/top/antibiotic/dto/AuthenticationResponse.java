@@ -17,4 +17,9 @@ public class AuthenticationResponse {
     private String refreshToken;
 
     private String username;
+    private String message = "Logowanie pomyślne";
+
+    public AuthenticationResponse(String toString) {
+        message = toString;
+    }
 }

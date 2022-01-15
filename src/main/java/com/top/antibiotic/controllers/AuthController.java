@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -47,8 +48,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public AuthenticationResponse login(@Valid @RequestBody LoginRequest loginRequest) {
-        return authService.login(loginRequest);
+    public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            AuthenticationResponse r = authService.login(loginRequest);
+            r.setMessage("Logowanie pomyślne");
+            return new ResponseEntity<>(r
+            ,HttpStatus.OK);
+        } catch (AuthenticationException authenticationException) {
+            return new ResponseEntity<>(new AuthenticationResponse("Nieprawidłowe hasło lub nazwa użytkownika")
+                    ,HttpStatus.FORBIDDEN);
+        }
     }
 
     @PostMapping("refresh/token")
