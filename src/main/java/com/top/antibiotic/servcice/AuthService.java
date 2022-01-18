@@ -14,6 +14,8 @@ import com.top.antibiotic.repository.VerificationTokenRepository;
 import com.top.antibiotic.security.JwtProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +36,9 @@ import java.util.UUID;
 @Transactional
 @Slf4j
 public class AuthService {
+
+    @Autowired
+    Environment env;
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -48,7 +54,7 @@ public class AuthService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setCreatedDate(Instant.now());
-        user.setEnabled(false);
+        user.setEnabled(true);
 
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new AntibioticsException("User already exists with username: "
@@ -60,13 +66,16 @@ public class AuthService {
                     + registerRequest.getEmail());
         }
 
-        userRepository.save(user);
+        if (! Arrays.asList(env.getActiveProfiles()).contains("tests")) {
+            user.setEnabled(false);
+            String token = generateVerificationToken(user);
+            mailService.sendMail(new NotificationEmail("Activate your account",
+                    user.getEmail(),
+                    "click on the url below to activate your account: "+
+                            "http://localhost:8080/api/auth/accountVerification/" + token));
+        }
 
-        String token = generateVerificationToken(user);
-        mailService.sendMail(new NotificationEmail("Activate your account",
-                user.getEmail(),
-                "click on the url below to activate your account: "+
-                        "http://localhost:8080/api/auth/accountVerification/" + token));
+        userRepository.save(user);
     }
 
     private String generateVerificationToken(User user) {

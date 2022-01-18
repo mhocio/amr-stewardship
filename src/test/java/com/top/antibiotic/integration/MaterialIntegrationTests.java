@@ -1,12 +1,14 @@
 package com.top.antibiotic.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.top.antibiotic.dto.MaterialDto;
 import com.top.antibiotic.dto.PatientDto;
+import com.top.antibiotic.entities.Material;
 import com.top.antibiotic.entities.Patient;
-import com.top.antibiotic.entities.Ward;
+import com.top.antibiotic.mapper.MaterialMapper;
 import com.top.antibiotic.mapper.PatientMapper;
+import com.top.antibiotic.servcice.MaterialService;
 import com.top.antibiotic.servcice.PatientService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
 
 @ActiveProfiles("tests")
 @RunWith(SpringRunner.class)
@@ -37,49 +40,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         locations = "classpath:application-integrationtest.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Slf4j
-public class PatientIntegrationTests {
+public class MaterialIntegrationTests {
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private PatientService patientService;
+    private MaterialService materialService;
 
     @Autowired
-    private PatientMapper patientMapper;
+    private MaterialMapper materialMapper;
 
-    private final String uri = "/api/patient";
+    private final String uri = "/api/material";
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Test
-    public void addPatientAndGetAllTest() throws Exception {
-        String firstName = "Mikolaj";
-        String secondName = "Hoscilo";
-        String pesel = "345345";
-        patientService.save(PatientDto.builder()
-                        .firstName(firstName)
-                        .secondName(secondName)
-                        .pesel(pesel)
-                        .build()
-        );
-
-        mvc.perform(get(uri))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].patientId", is(1)))
-                .andExpect(jsonPath("$[0].firstName", is(firstName)))
-                .andExpect(jsonPath("$[0].secondName", is(secondName)))
-                .andExpect(jsonPath("$[0].pesel", is(pesel)));
-
-        String firstName2 = "Radek";
-        String secondName2 = "Dubiel";
-        String pesel2 = "453475675";
-        patientService.save(PatientDto.builder()
-                .firstName(firstName2)
-                .secondName(secondName2)
-                .pesel(pesel2)
-                .patientId(42L)
+    public void addMaterialAndGetAllTest() throws Exception {
+        String name = "Material name";
+        materialService.save(MaterialDto.builder()
+                .name(name)
                 .build()
         );
 
@@ -87,26 +66,35 @@ public class PatientIntegrationTests {
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[1].patientId", is(2)))
-                .andExpect(jsonPath("$[1].firstName", is(firstName2)))
-                .andExpect(jsonPath("$[1].secondName", is(secondName2)))
-                .andExpect(jsonPath("$[1].pesel", is(pesel2)));
+                .andExpect(jsonPath("$[0].materialId", is(1)))
+                .andExpect(jsonPath("$[0].name", is(name)));
+
+        String name2 = "Material name 2";
+        materialService.save(MaterialDto.builder()
+                .name(name2)
+                .build()
+        );
+
+        mvc.perform(get(uri))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[1].materialId", is(2)))
+                .andExpect(jsonPath("$[1].name", is(name2)));
 
         mvc.perform(get(uri + "/2"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.patientId", is(2)))
-                .andExpect(jsonPath("$.firstName", is(firstName2)))
-                .andExpect(jsonPath("$.secondName", is(secondName2)))
-                .andExpect(jsonPath("$.pesel", is(pesel2)));
+                .andExpect(jsonPath("$.materialId", is(2)))
+                .andExpect(jsonPath("$.name", is(name2)));
     }
 
     @Test
     public void addWrongDtoTest() throws Exception {
         String json = ow.writeValueAsString(
-                patientMapper.mapPatientToDto(Patient.builder().
-                        patientId(42L).build())
+                materialMapper.mapMaterialToDto(Material.builder().
+                        materialId(42L).build())
         );
 
         ResultActions r = mvc.perform(post(uri)
@@ -114,21 +102,17 @@ public class PatientIntegrationTests {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().is(400))
-                .andExpect(handler().handlerType(com.top.antibiotic.controllers.PatientController.class))
-                .andExpect(handler().methodName("createPatient"));
+                .andExpect(handler().handlerType(com.top.antibiotic.controllers.MaterialController.class))
+                .andExpect(handler().methodName("createMaterial"));
     }
 
     @Test
     public void postAndGetTest() throws Exception {
-        String firstName = "Mikolaj";
-        String secondName = "Hoscilo";
-        String pesel = "345345";
+        String name = "Material name";
         String json = ow.writeValueAsString(
-                patientMapper.mapPatientToDto(Patient.builder()
-                        .patientId(42L)
-                        .firstName(firstName)
-                        .secondName(secondName)
-                        .pesel(pesel)
+                materialMapper.mapMaterialToDto(Material.builder()
+                        .materialId(42L)
+                        .name(name)
                         .build())
         );
 
@@ -137,12 +121,15 @@ public class PatientIntegrationTests {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().is(201))
-                .andExpect(jsonPath("$.patientId", is(1)))
-                .andExpect(jsonPath("$.firstName", is(firstName)))
-                .andExpect(jsonPath("$.secondName", is(secondName)))
-                .andExpect(jsonPath("$.pesel", is(pesel)))
-                .andExpect(handler().handlerType(com.top.antibiotic.controllers.PatientController.class))
-                .andExpect(handler().methodName("createPatient"));
+                .andExpect(jsonPath("$.materialId", is(1)))
+                .andExpect(jsonPath("$.name", is(name)));
+
+        mvc.perform(get(uri + "/1"))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.materialId", is(1)))
+                .andExpect(jsonPath("$.name", is(name)));
     }
 
 }

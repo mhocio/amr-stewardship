@@ -1,13 +1,15 @@
 package com.top.antibiotic.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.top.antibiotic.dto.PatientDto;
-import com.top.antibiotic.entities.Patient;
-import com.top.antibiotic.entities.Ward;
-import com.top.antibiotic.mapper.PatientMapper;
-import com.top.antibiotic.servcice.PatientService;
+import com.top.antibiotic.dto.BacteriaDto;
+import com.top.antibiotic.dto.MaterialDto;
+import com.top.antibiotic.entities.Bacteria;
+import com.top.antibiotic.entities.Material;
+import com.top.antibiotic.mapper.BacteriaMapper;
+import com.top.antibiotic.mapper.MaterialMapper;
+import com.top.antibiotic.servcice.BacteriaService;
+import com.top.antibiotic.servcice.MaterialService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ActiveProfiles("tests")
 @RunWith(SpringRunner.class)
@@ -37,49 +40,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         locations = "classpath:application-integrationtest.properties")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Slf4j
-public class PatientIntegrationTests {
+public class BacteriaIntegrationTests {
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
-    private PatientService patientService;
+    private BacteriaService bacteriaService;
 
     @Autowired
-    private PatientMapper patientMapper;
+    private BacteriaMapper bacteriaMapper;
 
-    private final String uri = "/api/patient";
+    private final String uri = "/api/bacteria";
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Test
-    public void addPatientAndGetAllTest() throws Exception {
-        String firstName = "Mikolaj";
-        String secondName = "Hoscilo";
-        String pesel = "345345";
-        patientService.save(PatientDto.builder()
-                        .firstName(firstName)
-                        .secondName(secondName)
-                        .pesel(pesel)
-                        .build()
-        );
-
-        mvc.perform(get(uri))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].patientId", is(1)))
-                .andExpect(jsonPath("$[0].firstName", is(firstName)))
-                .andExpect(jsonPath("$[0].secondName", is(secondName)))
-                .andExpect(jsonPath("$[0].pesel", is(pesel)));
-
-        String firstName2 = "Radek";
-        String secondName2 = "Dubiel";
-        String pesel2 = "453475675";
-        patientService.save(PatientDto.builder()
-                .firstName(firstName2)
-                .secondName(secondName2)
-                .pesel(pesel2)
-                .patientId(42L)
+    public void addBacteriaAndGetAllTest() throws Exception {
+        String name = "Bacteria name";
+        String subtype = "TYPE";
+        bacteriaService.save(BacteriaDto.builder()
+                .name(name)
+                .subtype(subtype)
                 .build()
         );
 
@@ -87,26 +68,40 @@ public class PatientIntegrationTests {
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[1].patientId", is(2)))
-                .andExpect(jsonPath("$[1].firstName", is(firstName2)))
-                .andExpect(jsonPath("$[1].secondName", is(secondName2)))
-                .andExpect(jsonPath("$[1].pesel", is(pesel2)));
+                .andExpect(jsonPath("$[0].bacteriaId", is(1)))
+                .andExpect(jsonPath("$[0].name", is(name)))
+                .andExpect(jsonPath("$[0].subtype", is(subtype)));
+
+        String name2 = "Bacteria name 2";
+        String subtype2 = "TYPE 2";
+        bacteriaService.save(BacteriaDto.builder()
+                .name(name2)
+                .subtype(subtype2)
+                .build()
+        );
+
+        mvc.perform(get(uri))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[1].bacteriaId", is(2)))
+                .andExpect(jsonPath("$[1].name", is(name2)))
+                .andExpect(jsonPath("$[1].subtype", is(subtype2)));
 
         mvc.perform(get(uri + "/2"))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.patientId", is(2)))
-                .andExpect(jsonPath("$.firstName", is(firstName2)))
-                .andExpect(jsonPath("$.secondName", is(secondName2)))
-                .andExpect(jsonPath("$.pesel", is(pesel2)));
+                .andExpect(jsonPath("$.bacteriaId", is(2)))
+                .andExpect(jsonPath("$.name", is(name2)))
+                .andExpect(jsonPath("$.subtype", is(subtype2)));
     }
 
     @Test
     public void addWrongDtoTest() throws Exception {
         String json = ow.writeValueAsString(
-                patientMapper.mapPatientToDto(Patient.builder().
-                        patientId(42L).build())
+                bacteriaMapper.mapBacteriaToDto(Bacteria.builder().
+                        bacteriaId(42L).build())
         );
 
         ResultActions r = mvc.perform(post(uri)
@@ -114,21 +109,19 @@ public class PatientIntegrationTests {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().is(400))
-                .andExpect(handler().handlerType(com.top.antibiotic.controllers.PatientController.class))
-                .andExpect(handler().methodName("createPatient"));
+                .andExpect(handler().handlerType(com.top.antibiotic.controllers.BacteriaController.class))
+                .andExpect(handler().methodName("createBacteria"));
     }
 
     @Test
     public void postAndGetTest() throws Exception {
-        String firstName = "Mikolaj";
-        String secondName = "Hoscilo";
-        String pesel = "345345";
+        String name = "Bacteria name";
+        String subtype = "TYPE";
         String json = ow.writeValueAsString(
-                patientMapper.mapPatientToDto(Patient.builder()
-                        .patientId(42L)
-                        .firstName(firstName)
-                        .secondName(secondName)
-                        .pesel(pesel)
+                bacteriaMapper.mapBacteriaToDto(Bacteria.builder()
+                        .bacteriaId(42L)
+                        .name(name)
+                        .subtype(subtype)
                         .build())
         );
 
@@ -137,12 +130,17 @@ public class PatientIntegrationTests {
                         .content(json))
                 .andDo(print())
                 .andExpect(status().is(201))
-                .andExpect(jsonPath("$.patientId", is(1)))
-                .andExpect(jsonPath("$.firstName", is(firstName)))
-                .andExpect(jsonPath("$.secondName", is(secondName)))
-                .andExpect(jsonPath("$.pesel", is(pesel)))
-                .andExpect(handler().handlerType(com.top.antibiotic.controllers.PatientController.class))
-                .andExpect(handler().methodName("createPatient"));
+                .andExpect(jsonPath("$.bacteriaId", is(1)))
+                .andExpect(jsonPath("$.name", is(name)))
+                .andExpect(jsonPath("$.subtype", is(subtype)));
+
+        mvc.perform(get(uri))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].bacteriaId", is(1)))
+                .andExpect(jsonPath("$[0].name", is(name)))
+                .andExpect(jsonPath("$[0].subtype", is(subtype)));
     }
 
 }
