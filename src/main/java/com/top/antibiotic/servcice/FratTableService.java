@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @AllArgsConstructor
@@ -102,9 +103,14 @@ public class FratTableService {
 
         List<String> bacterias = new ArrayList<String>();
         List<Double> bacteriaFrequency = new ArrayList<Double>();  // in percent
+        AtomicReference<Integer> sumOfOccurrence = new AtomicReference<>(0);
+        bacteriaOccurrence.forEach((bacteria, numberOfOccurrence) -> {
+            sumOfOccurrence.set((int) (sumOfOccurrence.get() + numberOfOccurrence));
+        });
+
         bacteriaOccurrence.forEach((bacteria, numberOfOccurrence) -> {
             bacterias.add(bacteria);
-            bacteriaFrequency.add((double) 100 * numberOfOccurrence / noOfExaminations);
+            bacteriaFrequency.add((double) 100 * numberOfOccurrence / sumOfOccurrence.get());
         });
         res.setBacterias(bacterias);
 
@@ -113,7 +119,7 @@ public class FratTableService {
             String bacteria = bacterias.get(i);
             List<String> row = new ArrayList<String>();
             row.add(bacteria);
-            row.add(bacteriaFrequency.get(i).toString());
+            row.add(String.format("%.2f", bacteriaFrequency.get(i)));
 
             for (String antibio: antibiotics) {
                 String valS = "-";
@@ -123,10 +129,12 @@ public class FratTableService {
                 if (sucpectabilities.containsKey(key)) {
                     Long s = sucpectabilities.get(key).getSuspectible();
                     Long r = sucpectabilities.get(key).getResistant();
-                    Double percent = (double) (s / (r + s)) * 100;
+
+                    Double percent = Double.valueOf((100.0 * s / (r * 1.0 + s * 1.0)));
                     Double F = percent * bacteriaFrequency.get(i) / 100;
-                    valS = percent.toString();
-                    valF = F.toString();
+
+                    valS = (String.format("%.2f", percent));
+                    valF = (String.format("%.2f", F));
                 }
                 row.add(valS);
                 row.add(valF);
