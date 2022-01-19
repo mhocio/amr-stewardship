@@ -179,7 +179,7 @@ public class AuthIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andDo(print())
-                .andExpect(status().is(404));
+                .andExpect(status().is(403));
     }
 
 }

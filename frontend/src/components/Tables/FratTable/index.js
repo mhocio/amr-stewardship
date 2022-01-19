@@ -25,13 +25,13 @@ export default function FratTable({ fratData }) {
       >
         <TableHead>
           <TableRow sx={{ background: "#D6E4FC" }}>
-            <TableCell sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }} rowSpan={3}>
+            <TableCell
+              sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }}
+              rowSpan={3}
+            >
               Szczep bakteryjny
             </TableCell>
-            <TableCell
-              rowSpan={3}
-              align="center"
-            >
+            <TableCell rowSpan={3} align="center">
               %I
             </TableCell>
             {fratData?.antibiotics?.map((item, i) => {
@@ -64,7 +64,11 @@ export default function FratTable({ fratData }) {
                 }
               }}
             >
-              <TableCell component="th" scope="row" sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }}>
+              <TableCell
+                component="th"
+                scope="row"
+                sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }}
+              >
                 {row[0]}
               </TableCell>
               {row.slice(1).map((item, i) => {
@@ -72,29 +76,6 @@ export default function FratTable({ fratData }) {
               })}
             </TableRow>
           ))}
-          <TableRow
-            sx={{
-              "&:nth-of-type(even)": {
-                background: "#EBF2FE"
-              },
-              height: 45
-            }}
-          >
-            <TableCell sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }}>Razem</TableCell>
-            <TableCell align="center">432</TableCell>
-            <TableCell />
-            <TableCell align="center">43</TableCell>
-            <TableCell />
-            <TableCell align="center">55</TableCell>
-          </TableRow>
-          <TableRow sx={{ background: "#D6E4FC", height: 45 }}>
-            <TableCell sx={{ position: "sticky", left: 0, backgroundColor: "#D6E4FC" }}>F/I [%] aktywności ogólnej</TableCell>
-            <TableCell align="center">432</TableCell>
-            <TableCell />
-            <TableCell align="center">43</TableCell>
-            <TableCell />
-            <TableCell align="center">55</TableCell>
-          </TableRow>
         </TableBody>
       </Table>
     </TableContainer>

@@ -14,8 +14,8 @@ public class ExHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<Object> handle(Exception exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
-    }
+//    @ExceptionHandler(value = Exception.class)
+//    public ResponseEntity<Object> handle(Exception exception) {
+//        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+//    }
 }

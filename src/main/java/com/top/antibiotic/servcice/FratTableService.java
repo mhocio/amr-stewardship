@@ -115,9 +115,16 @@ public class FratTableService {
         res.setBacterias(bacterias);
 
         List<List<String>> rows = new ArrayList<>();
+
+        HashMap<String, Double> resultSum = new HashMap<String, Double>();
+        for (String antibio: antibiotics) {
+            resultSum.put(antibio, 0.0);
+        }
+
         for (int i = 0; i < bacterias.size(); i++) {
             String bacteria = bacterias.get(i);
             List<String> row = new ArrayList<String>();
+
             row.add(bacteria);
             row.add(String.format("%.2f", bacteriaFrequency.get(i)));
 
@@ -132,18 +139,29 @@ public class FratTableService {
 
                     Double percent = Double.valueOf((100.0 * s / (r * 1.0 + s * 1.0)));
                     Double F = percent * bacteriaFrequency.get(i) / 100;
+                    resultSum.put(antibio, resultSum.get(antibio) + F);
 
                     valS = (String.format("%.2f", percent));
                     valF = (String.format("%.2f", F));
                 }
                 row.add(valS);
                 row.add(valF);
+
             }
 
             rows.add(row);
         }
-        res.setRows(rows);
 
+        List<String> toAdd = new ArrayList<>();
+        toAdd.add("Razem:");
+        toAdd.add("100.00");
+        for (Double v: resultSum.values()) {
+            toAdd.add("");
+            toAdd.add(String.format("%.2f", v));
+        }
+        rows.add(toAdd);
+
+        res.setRows(rows);
         return res;
     }
 }
