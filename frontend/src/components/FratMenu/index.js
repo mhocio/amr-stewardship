@@ -49,11 +49,6 @@ export default function FratMenu({ handleSetFratData }) {
 
   const today = dayjs();
 
-  axios.interceptors.request.use((request) => {
-    console.log("Starting Request", JSON.stringify(request, null, 2));
-    return request;
-  });
-
   const getDropdownData = async () => {
     axios
       .all([

@@ -21,17 +21,17 @@ const initialOptions = [
 ];
 
 
-export default function AntibioticSelect() {
+export default function BacteriaSelect({ handleSusceptibilityChart }) {
 
-  const [antibiotics, setAntibiotics] = useState([]);
+  const [bacteria, setBacteria] = useState([]);
   const [errorFlag, setErrorFlag] = useState(false);
 
   useEffect(() => {
-    getAllAntibiotics();
+    getAllBacteria();
   }, [])
 
-  const getAllAntibiotics = () => {
-    axios.get(`${BASE_URL}/antibiotic`, {
+  const getAllBacteria = () => {
+    axios.get(`${BASE_URL}/bacteria`, {
       method: 'GET',
       mode: 'cors',
       headers: {
@@ -43,7 +43,7 @@ export default function AntibioticSelect() {
     })
     .then((res) => {
       console.log(res.data);
-      setAntibiotics(res.data);
+      setBacteria(res.data);
     })
     .catch((err) => {
       setErrorFlag(true);
@@ -54,14 +54,14 @@ export default function AntibioticSelect() {
     <Paper sx={{ padding: '20px' }}>
       <Autocomplete
         disablePortal
-        id="antibiotic-select"
+        id="bacteria-select"
         getOptionLabel={option => option.name}
-        getOptionValue={option => option.antibioticId}
-        options={antibiotics}
+        getOptionValue={option => option.bacteriaId}
+        options={bacteria}
         onChange={(event, newValue) => {
-          console.log(newValue);
+          handleSusceptibilityChart(newValue?.name);
         }}
-        renderInput={(params) => <TextField {...params} label="Antybiotyk"/>}
+        renderInput={(params) => <TextField {...params} label="Drobnoustrój"/>}
       />
     </Paper>
   );

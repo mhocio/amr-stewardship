@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 
 // material-ui
 import { Paper, Grid } from '@mui/material';
@@ -57,16 +57,17 @@ const data = [
   },
 ];
 
-export default function SusceptibilityChart() {
+export default function SusceptibilityChart({ chartData }) {
 
   const [getPng, { ref: myRef }] = useCurrentPng();
+  const [modifiedData, setModifiedData] = useState([]);
   const handleDownload = useCallback(async () => {
     const png = await getPng();
     if (png) {
       FileSaver.saveAs(png, "wykres.png");
     }
   }, [getPng]);
-
+  
   return (
     <Grid container direction="column" spacing={3} wrap="nowrap">
       <Grid item xs={9}>
@@ -76,21 +77,21 @@ export default function SusceptibilityChart() {
               ref={myRef}
               width={500}
               height={300}
-              data={data}
+              data={chartData}
               margin={{
                 top: 5,
                 right: 30,
                 left: 20,
-                bottom: 5,
+                bottom: 50,
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <XAxis dataKey="Nazwa" interval={0} tick={{ angle: 40, textAnchor: 'start', 'dominantBaseline': 'ideographic' }}/>
+              <YAxis allowDataOverflow={true} domain={[0, 100]}/>
               <Tooltip />
-              <Legend />
-              <Bar dataKey="pv" fill="#8884d8" />
-              <Bar dataKey="uv" fill="#82ca9d" />
+              <Legend layout="horizontal" verticalAlign="top" align="center" />
+             <Bar dataKey={2022} fill={"#000000".replace(/0/g,function(){return (~~(Math.random()*16)).toString(16)})}/>
+              
             </BarChart>
           </ResponsiveContainer>
         </Paper>

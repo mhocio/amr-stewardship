@@ -75,12 +75,6 @@ export default function Sidebar({ toggleDrawer, isOpen }) {
           </ListItemIcon>
           <ListItemText primary='FRAT' />
         </ListItem>
-        <ListItem button key='Ustawienia' onClick={() => navigate('/page/settings')}>
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary='Ustawienia' />
-        </ListItem>
       </List>
     </Drawer>
 
