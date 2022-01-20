@@ -1,5 +1,6 @@
 package com.top.antibiotic.servcice;
 
+import com.monitorjbl.xlsx.StreamingReader;
 import com.top.antibiotic.data.AntibiogramRow;
 import com.top.antibiotic.dto.AntibiogramResponse;
 import com.top.antibiotic.entities.*;
@@ -8,7 +9,10 @@ import com.top.antibiotic.mapper.AntibiogramMapper;
 import com.top.antibiotic.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -41,9 +45,6 @@ public class AntibiogramService {
 
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
-
-    @PersistenceContext
-    private EntityManager em;
 
     @Transactional(readOnly = true)
     public List<AntibiogramResponse> getAll() {
@@ -78,20 +79,22 @@ public class AntibiogramService {
     @Transactional()
     public void saveFromFile(MultipartFile reapExcelDataFile) throws IOException, ParseException {
 
-        XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
-        XSSFSheet worksheet = workbook.getSheetAt(2);
+        Workbook workbook = StreamingReader.builder().rowCacheSize(100) // number of rows to keep in memory
+                .bufferSize(4096)
+                .open(reapExcelDataFile.getInputStream()); // InputStream or File for XLSX file (required)
+
+        Iterator<Row> rowIterator = workbook.getSheetAt(2).rowIterator();
 
         // whether we insert this new Examination number this time
         Set<Long> newExaminationNumbers = new HashSet<Long>();
 
-        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+        List<Antibiogram> toInsert = new ArrayList<>();
 
-            //log.info(i.toString());
-            List<String> items;
-            XSSFRow row = worksheet.getRow(i);
-            try {
-                items = new AntibiogramRow(row).getListItems();
-            } catch (Exception e) {
+        int rowNo = -1;
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            rowNo = rowNo + 1;
+            if (rowNo == 0) {
                 continue;
             }
 
@@ -99,6 +102,30 @@ public class AntibiogramService {
 
             Antibiogram antibiogram = new Antibiogram();
             antibiogram.setCreatedDate(date);
+
+            List<String> items = new ArrayList<>();
+
+            int cellIter = 0;
+            for (Cell c : row) {
+                if (cellIter == c.getColumnIndex()) {
+                    items.add(c.getStringCellValue());
+                } else {
+                    for (int ii = cellIter; ii < c.getColumnIndex(); ii++)
+                        items.add("");
+                    items.add(c.getStringCellValue());
+                    cellIter = c.getColumnIndex();
+                }
+                cellIter += 1;
+                //log.info(String.valueOf(c.getColumnIndex()));
+            }
+
+            if (items.size() == 26) {
+                items.add("");
+            }
+
+            if (items.size() < 27) {
+                continue;
+            }
 
             // do not proceed if sb previously pushed this file or file with this Examination
             if (!examinationRepository.existsByNumber(Long.parseLong(items.get(5)))) {
@@ -211,9 +238,30 @@ public class AntibiogramService {
             antibiogram.setMode(items.get(25));
             antibiogram.setPryw(items.get(26));
 
+//            if (toInsert.size() > 0) {
+//                if (toInsert.get(0).getOrderNumber() ==
+//                        antibiogram.getOrderNumber()) {
+//                    toInsert.add(antibiogram);
+//                } else {
+//                    antibiogramRepository.saveAll(toInsert);
+//                    toInsert.clear();
+//                    em.flush();
+//                    em.clear();
+//                }
+//            } else {
+//                toInsert.add(antibiogram);
+//            }
+
             Antibiogram savedAntibiogram = antibiogramRepository.save(antibiogram);
             em.flush();
             em.clear();
         }
+
+//        if (toInsert.size() > 0) {
+//            antibiogramRepository.saveAll(toInsert);
+//            toInsert.clear();
+//            em.flush();
+//            em.clear();
+//        }
     }
 }

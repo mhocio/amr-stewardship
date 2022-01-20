@@ -17,7 +17,13 @@ antibiotics = [antibiotic("Amikacin", "AN"),
     antibiotic("Linezolid", "LIN"),
     antibiotic("Oxacillin", "OX"),
     antibiotic("Rifampicin", "RIF"),
-    antibiotic("Teicoplanin", "TEC"),]
+    antibiotic("Teicoplanin", "TEC"),
+    antibiotic("A1", "A1"),
+    antibiotic("A2", "A2"),
+    antibiotic("A3", "A3"),
+    antibiotic("A4", "A4"),
+    antibiotic("A5", "A5"),
+    antibiotic("A6", "A6")]
 
 class bacteria:
     def __init__(self, name, subtype):
@@ -29,7 +35,12 @@ bacterias = [bacteria("Staphylococcus aureus", ""),
     bacteria("Staphylococcus cohnii ssp urealyticus", ""),
     bacteria("Enterococcus faecalis", "HLGR"),
     bacteria("Enterococcus faecium", "VRE "),
-    bacteria("Actinomyces naeslundii", "")]
+    bacteria("Actinomyces naeslundii", ""),
+    bacteria("b1", ""),
+    bacteria("b2", ""),
+    bacteria("b3", ""),
+    bacteria("b4", ""),
+    bacteria("b5", "")]
 
 class material:
     def __init__(self, name):
@@ -37,7 +48,15 @@ class material:
 
 materials = [material("Wymaz z ropnia - posiew"),
     material("Wymaz z nosa w kierunku MRSA - posiew"),
-    material("Mocz"),]
+    material("Mocz"),
+    material("M1"),
+    material("M2"),
+    material("M3"),
+    material("M4"),
+    material("M5"),
+    material("M6"),
+    material("M7"),
+    material("M8")]
 
 class patient:
     def __init__(self, pesel, first_name, second_name):
@@ -47,6 +66,10 @@ class patient:
 
 patients = [patient(97041012345, "Jan", "Kowalski"),
     patient(96012234567, "Joanna", "Nowak"),
+    patient(23847623453, "Wiktor", "Wozny"),
+    patient(23847623453, "Wiktor", "Wozny"),
+    patient(23847623453, "Wiktor", "Wozny"),
+    patient(23847623453, "Wiktor", "Wozny"),
     patient(23847623453, "Wiktor", "Wozny"),]
 
 class ward:
@@ -184,38 +207,41 @@ row = 0
 col = 0
 
 # Create a workbook and add worksheets
-workbook = xlsxwriter.Workbook('smaller2.xlsx')
+workbook = xlsxwriter.Workbook('file.xlsx')
 worksheet0 = workbook.add_worksheet()
 worksheet1 = workbook.add_worksheet()
 worksheet_FRAT = workbook.add_worksheet()
 worksheet_FRAT.write(row, col, "Zleceniodawca")
-worksheet_FRAT.write(row, col, "Pacjent")
-worksheet_FRAT.write(row, col, "")
-worksheet_FRAT.write(row, col, "PESEL/Data ur.")
-worksheet_FRAT.write(row, col, "Data zlecenia")
-worksheet_FRAT.write(row, col, "Nr zlecenie")
-worksheet_FRAT.write(row, col, "Materiał badany")
-worksheet_FRAT.write(row, col, "Izolacja")
-worksheet_FRAT.write(row, col, "Mechanizmy opornoci")
-worksheet_FRAT.write(row, col, "Wr")
-worksheet_FRAT.write(row, col, "Mic")
-worksheet_FRAT.write(row, col, "Alert")
-worksheet_FRAT.write(row, col, "Patogen")
-worksheet_FRAT.write(row, col, "Wzrost")
-worksheet_FRAT.write(row, col, "Pierwszy~izolat")
-worksheet_FRAT.write(row, col, "ID Zlecenia")
-worksheet_FRAT.write(row, col, "ID Izolacji")
-worksheet_FRAT.write(row, col, "Kod izolacji")
-worksheet_FRAT.write(row, col, "Kod antybiotyku")
-worksheet_FRAT.write(row, col, "Wynik")
-worksheet_FRAT.write(row, col, "Nr dzienny")
-worksheet_FRAT.write(row, col, "Tryb")
-worksheet_FRAT.write(row, col, "Pryw")
-worksheet_FRAT.write(row, col, "Lekarz zlecajšcy")
+worksheet_FRAT.write(row, col+1, "Pacjent")
+worksheet_FRAT.write(row, col+2, "")
+worksheet_FRAT.write(row, col+3, "PESEL/Data ur.")
+worksheet_FRAT.write(row, col+4, "Data zlecenia")
+worksheet_FRAT.write(row, col+5, "Nr zlecenie")
+worksheet_FRAT.write(row, col+6, "Materiał badany")
+worksheet_FRAT.write(row, col+7, "Izolacja")
+worksheet_FRAT.write(row, col+8, "Mechanizmy opornoci")
+worksheet_FRAT.write(row, col+9, "Antybiotyk")
+worksheet_FRAT.write(row, col+10, "Wr")
+worksheet_FRAT.write(row, col+11, "Mic")
+worksheet_FRAT.write(row, col+12, "Alert")
+worksheet_FRAT.write(row, col+13, "Patogen")
+worksheet_FRAT.write(row, col+14, "Wzrost")
+worksheet_FRAT.write(row, col+15, "Pierwszy~izolat")
+worksheet_FRAT.write(row, col+16, "Zakażenie~szpitalne")
+worksheet_FRAT.write(row, col+17, "ID Zlecenia")
+worksheet_FRAT.write(row, col+18, "ID Badania")
+worksheet_FRAT.write(row, col+19, "ID Izolacji")
+worksheet_FRAT.write(row, col+20, "Kod izolacji")
+worksheet_FRAT.write(row, col+21, "IzolNum")
+worksheet_FRAT.write(row, col+22, "Kod antybiotyku")
+worksheet_FRAT.write(row, col+23, "Wynik")
+worksheet_FRAT.write(row, col+24, "Nr dzienny")
+worksheet_FRAT.write(row, col+25, "Tryb")
+worksheet_FRAT.write(row, col+26, "Pryw")
 
 row = 1
 order_number_generator = generator()
-for i in range(0, 169):
+for i in range(0, 4000):
     for anti in generate_examination(order_number_generator.next_num()):
         worksheet_FRAT.write(row, col, anti.ward.name)
         worksheet_FRAT.write(row, col+1, anti.patient.first_name)
