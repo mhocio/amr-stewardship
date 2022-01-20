@@ -66,14 +66,14 @@ public class AuthService {
                     + registerRequest.getEmail());
         }
 
-        if (! Arrays.asList(env.getActiveProfiles()).contains("tests")) {
-            user.setEnabled(false);
-            String token = generateVerificationToken(user);
-            mailService.sendMail(new NotificationEmail("Activate your account",
-                    user.getEmail(),
-                    "click on the url below to activate your account: "+
-                            "http://localhost:8080/api/auth/accountVerification/" + token));
-        }
+//        if (! Arrays.asList(env.getActiveProfiles()).contains("tests")) {
+//            user.setEnabled(false);
+//            String token = generateVerificationToken(user);
+//            mailService.sendMail(new NotificationEmail("Activate your account",
+//                    user.getEmail(),
+//                    "click on the url below to activate your account: "+
+//                            "http://localhost:8080/api/auth/accountVerification/" + token));
+//        }
 
         userRepository.save(user);
     }
