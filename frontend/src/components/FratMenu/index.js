@@ -99,7 +99,7 @@ export default function FratMenu({ handleSetFratData }) {
       onSubmit={(values) => {
         setLoading(true);
         axios
-          .get(`${BASE_URL}/frat-table/${values.ward}/${values.material}`, {
+          .get(`${BASE_URL}/frat-table/${values.ward}/${values.material}?startDate=${values.startDate}&endDate=${values.endDate}`, {
             method: "GET",
             mode: "cors",
             headers: {

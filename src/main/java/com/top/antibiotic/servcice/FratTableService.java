@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +37,7 @@ public class FratTableService {
     private final ExaminationRepository examinationRepository;
 
     public FratTableResponse getTable(FratRequest fratRequest) {
+
         Ward ward = wardRepository.findByName(fratRequest.getWard())
                 .orElseThrow(() -> new AntibioticsException("no ward found with name" +
                         fratRequest.getWard()));
@@ -43,8 +45,19 @@ public class FratTableService {
                 .orElseThrow(() -> new AntibioticsException("no ward found with name: " +
                         fratRequest.getMaterial()));
 
-        List<Examination> examinations = examinationRepository.findByWardAndMaterial(
-                ward, material);
+        List<Examination> examinations;
+        if (fratRequest.getStartDate() != null &&
+            fratRequest.getEndDate() != null) {
+            Date startDate = fratRequest.getStartDate();
+            Date endDate = fratRequest.getEndDate();
+
+            examinations = examinationRepository.findByWardAndMaterialAndOrderDateBetween(
+                    ward, material, startDate, endDate
+            );
+        } else {
+            examinations = examinationRepository.findByWardAndMaterial(
+                    ward, material);
+        }
 
         HashMap<String, Long> antibioticsOccurrence = new HashMap<String, Long>();
         HashMap<String, Long> bacteriaOccurrence = new HashMap<String, Long>();
