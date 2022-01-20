@@ -181,9 +181,23 @@ def generate_antibiograms(order_date, order_number, examination,
             antibiograms.append(single_anitibiogram)
     return antibiograms
 
+def getRandomDate(yearA, yearB):
+    if yearA >= yearB:
+        yearA = 2017
+        yearB = 2022
+
+    start_date = datetime.date(yearA, 1, 1)
+    end_date = datetime.date(yearB, 1, 1)
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+
+    return start_date + datetime.timedelta(days=random_number_of_days)
+
 def generate_examination(order_number):
     #order_number_generator = generator()
-    t = datetime.datetime(2012, 2, 23, 0, 0)
+    #t = datetime.datetime(2012, 2, 23, 0, 0)
+    t = getRandomDate(2017, 2022)
     order_date = t.strftime('%m/%d/%Y')
     material = get_random_material()
     patient = get_random_patient()
@@ -207,7 +221,7 @@ row = 0
 col = 0
 
 # Create a workbook and add worksheets
-workbook = xlsxwriter.Workbook('file.xlsx')
+workbook = xlsxwriter.Workbook('different_dates.xlsx')
 worksheet0 = workbook.add_worksheet()
 worksheet1 = workbook.add_worksheet()
 worksheet_FRAT = workbook.add_worksheet()
@@ -241,7 +255,7 @@ worksheet_FRAT.write(row, col+26, "Pryw")
 
 row = 1
 order_number_generator = generator()
-for i in range(0, 4000):
+for i in range(0, 600):
     for anti in generate_examination(order_number_generator.next_num()):
         worksheet_FRAT.write(row, col, anti.ward.name)
         worksheet_FRAT.write(row, col+1, anti.patient.first_name)

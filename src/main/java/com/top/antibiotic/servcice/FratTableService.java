@@ -15,10 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -165,12 +162,74 @@ public class FratTableService {
             rows.add(row);
         }
 
+        // TODO: sorting
+        Map<Integer, Double> unSortedMap = new HashMap<>();
+        int ii = 0;
+        for (Double v: resultSum.values()) {
+            unSortedMap.put(ii, v);
+            ii += 1;
+        }
+        LinkedHashMap<Integer, Double> reverseSortedMap = new LinkedHashMap<>();
+        unSortedMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+
+        HashMap<Integer, Integer> mapOldIndexesToSortedOnes = new HashMap<>();
+        mapOldIndexesToSortedOnes.put(0, 0);
+        mapOldIndexesToSortedOnes.put(1, 1);
+        ii = 2;
+        for (Integer val : reverseSortedMap.keySet()) {
+            mapOldIndexesToSortedOnes.put(ii, 2+2*val);
+            mapOldIndexesToSortedOnes.put(ii+1, 2+2*val + 1);
+            ii += 2;
+        }
+
+        List<String> sortedAntibio = new ArrayList<>();
+        for (int i = 0; i < antibiotics.size(); i++) {
+            sortedAntibio.add(antibiotics.get((Integer) reverseSortedMap.keySet().toArray()[i]));
+        }
+        res.setAntibiotics(sortedAntibio);
+
+        ///  sort rows
+        List<List<String>> sortedRows = new ArrayList<>();
+        for (List<String> row : rows) {
+            List<String> newRow = new ArrayList<>();
+            for (int i = 0; i < row.size(); i++) {
+                newRow.add(row.get(mapOldIndexesToSortedOnes.get(i)));
+            }
+            sortedRows.add(newRow);
+        }
+        rows = sortedRows;
+
+        // TODO: sort by bacterias
+        Map<Integer, Double> unSortedMapBacterias = new HashMap<>();
+        ii = 0;
+        for (Double v: bacteriaFrequency) {
+            unSortedMapBacterias.put(ii, v);
+            ii += 1;
+        }
+        LinkedHashMap<Integer, Double> reverseSortedMapBacterias = new LinkedHashMap<>();
+        unSortedMapBacterias.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .forEachOrdered(x -> reverseSortedMapBacterias.put(x.getKey(), x.getValue()));
+        log.info(reverseSortedMapBacterias.toString());
+
+        // SORT table by bacterias - by rows
+        List<List<String>> sortedRowsByBacterias = new ArrayList<>();
+        for (int i = 0; i < rows.size(); i++) {
+            sortedRowsByBacterias.add(rows.get((Integer) reverseSortedMapBacterias.keySet().toArray()[i]));
+        }
+        rows = sortedRowsByBacterias;
+
+        // NEXT
         List<String> toAdd = new ArrayList<>();
         toAdd.add("Razem:");
         toAdd.add("100.00");
-        for (Double v: resultSum.values()) {
+        for (int i = 0; i < resultSum.size(); i++) {
             toAdd.add("");
-            toAdd.add(String.format("%.2f", v));
+            toAdd.add(String.format("%.2f", resultSum.get(sortedAntibio.get(i))));
         }
         rows.add(toAdd);
 
