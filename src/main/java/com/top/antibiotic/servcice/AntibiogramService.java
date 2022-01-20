@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class AntibiogramService {
+    @PersistenceContext
+    private EntityManager em;
     // TODO
     private final WardRepository wardRepository;
     private final PatientRepository patientRepository;
@@ -59,6 +63,12 @@ public class AntibiogramService {
                 .stream()
                 .map(antibiogramMapper::mapAntibiogramToResponse)
                 .collect(Collectors.toList());
+    }
+
+    Boolean parseStringToBoolean(String s) {
+        if (s.startsWith("T") || s.startsWith("1") || s.startsWith("t"))
+            return true;
+        return false;
     }
 
     @Transactional()
@@ -186,11 +196,11 @@ public class AntibiogramService {
 
             antibiogram.setSusceptibility(items.get(10));
             antibiogram.setMic(items.get(11));
-            antibiogram.setAlert(Boolean.parseBoolean(items.get(12)));
-            antibiogram.setPatogen(Boolean.parseBoolean(items.get(13)));
+            antibiogram.setAlert(parseStringToBoolean(items.get(12)));
+            antibiogram.setPatogen(parseStringToBoolean(items.get(13)));
             antibiogram.setGrowth(items.get(14));
-            antibiogram.setFirstIsolate(Boolean.parseBoolean(items.get(15)));
-            antibiogram.setHospitalInfection(Boolean.parseBoolean(items.get(16)));
+            antibiogram.setFirstIsolate(parseStringToBoolean(items.get(15)));
+            antibiogram.setHospitalInfection(parseStringToBoolean(items.get(16)));
             antibiogram.setOrderId(Long.parseLong(items.get(17)));
             antibiogram.setTestId(Long.parseLong(items.get(18)));
             antibiogram.setIsolationId(Long.parseLong(items.get(19)));
@@ -202,6 +212,8 @@ public class AntibiogramService {
             antibiogram.setPryw(items.get(26));
 
             Antibiogram savedAntibiogram = antibiogramRepository.save(antibiogram);
+            em.flush();
+            em.clear();
         }
     }
 }
