@@ -1,5 +1,6 @@
 package com.top.antibiotic.servcice;
 
+import com.top.antibiotic.data.AntibiogramRow;
 import com.top.antibiotic.dto.AntibiogramResponse;
 import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
@@ -41,6 +42,9 @@ public class AntibiogramService {
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
 
+    @PersistenceContext
+    private EntityManager em;
+
     @Transactional(readOnly = true)
     public List<AntibiogramResponse> getAll() {
         return antibiogramRepository.findAll()
@@ -80,25 +84,21 @@ public class AntibiogramService {
         // whether we insert this new Examination number this time
         Set<Long> newExaminationNumbers = new HashSet<Long>();
 
-        for (Integer i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+        for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
 
-            log.info(i.toString());
+            //log.info(i.toString());
+            List<String> items;
             XSSFRow row = worksheet.getRow(i);
+            try {
+                items = new AntibiogramRow(row).getListItems();
+            } catch (Exception e) {
+                continue;
+            }
+
             Instant date = Instant.now();
-            DataFormatter formatter = new DataFormatter();
 
             Antibiogram antibiogram = new Antibiogram();
             antibiogram.setCreatedDate(date);
-
-            String s = formatter.formatCellValue(row.getCell(1));
-            List<String> items = new ArrayList<>();
-            for (int j = 0; j <= 26 ; j++) {
-                items.add(formatter.formatCellValue(row.getCell(j)));
-            }
-
-            if (items.get(0).isEmpty()) {
-                continue;
-            }
 
             // do not proceed if sb previously pushed this file or file with this Examination
             if (!examinationRepository.existsByNumber(Long.parseLong(items.get(5)))) {
