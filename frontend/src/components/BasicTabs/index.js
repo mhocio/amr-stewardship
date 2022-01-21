@@ -69,7 +69,7 @@ export default function BasicTabs() {
   const handleSusceptibilityChart = (bacteria) => {
     setLoading(true);
     axios
-      .get(`${BASE_URL}/chart/${bacteria}/${2022}/${dayjs().year()}`, {
+      .get(`${BASE_URL}/chart/${bacteria}/${2000}/${dayjs().year()}`, {
         method: "GET",
         mode: "cors",
         headers: {
@@ -80,11 +80,9 @@ export default function BasicTabs() {
         }
       })
       .then((res) => {
-        console.log(res.data);
         setChartData(modifySusceptibilityChartData(res.data));
       })
       .finally(() => {
-        console.log(chartData);
         setLoading(false);
       });
   }
