@@ -48,7 +48,7 @@ services:
       MYSQL_DATABASE: db_antibiotic
       MYSQL_USER: springuser
       MYSQL_PASSWORD: ThePassword
-      MYSQL_ROOT_PASSWORD:
+      MYSQL_ROOT_PASSWORD: root
     volumes:
       - db-data:/var/lib/mysql
     networks:

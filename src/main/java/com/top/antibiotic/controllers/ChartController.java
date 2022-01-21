@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/chart")
@@ -24,7 +25,7 @@ public class ChartController {
 
     @GetMapping(path = "/{bacteria}/{startDate}/{endDate}")
     public ResponseEntity<SusceptibilityChartResponse> getChartData(
-           @PathVariable String bacteria, @PathVariable Integer startDate, @PathVariable Integer endDate) {
+           @PathVariable String bacteria, @PathVariable Integer startDate, @PathVariable Integer endDate) throws ParseException {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(chartService.getSusceptibilityChartData(
