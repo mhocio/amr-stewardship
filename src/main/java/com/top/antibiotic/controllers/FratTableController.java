@@ -2,6 +2,7 @@ package com.top.antibiotic.controllers;
 
 import com.top.antibiotic.dto.FratRequest;
 import com.top.antibiotic.dto.FratTableResponse;
+import com.top.antibiotic.dto.SeveralFratTablesResponse;
 import com.top.antibiotic.repository.*;
 import com.top.antibiotic.servcice.FratTableService;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class FratTableController {
 
     @RequestMapping(path = "/{wardName}/{materialName}",
             method = RequestMethod.GET)
-    public FratTableResponse getTable(
+    public SeveralFratTablesResponse getTable(
             @PathVariable String wardName, @PathVariable String materialName,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate,

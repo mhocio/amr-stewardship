@@ -14,6 +14,7 @@ import { useLoading } from "../loading/loading-context";
 
 const FratPage = () => {
   const [fratData, setFratData] = useState([]);
+  
   const { loading, setLoading } = useLoading();
 
   const handleSetFratData = (value) => {
@@ -38,8 +39,20 @@ const FratPage = () => {
           </Paper>
         </Grid>
         <Grid item>
-          {fratData.antibiotics ? (
-            <FratTable fratData={fratData} />
+          {fratData?.firstTable?.antibiotics ? (
+            <FratTable fratData={fratData.firstTable} />
+          ) : loading ? (
+            <Box sx={{ height: "100%" }}>
+              <Skeleton height={100} />
+              {skeletons}
+            </Box>
+          ) : (
+            <FratTablePlaceholder />
+          )}
+        </Grid>
+        <Grid item>
+          {fratData?.secondTable?.antibiotics ? (
+            <FratTable fratData={fratData.secondTable} />
           ) : loading ? (
             <Box sx={{ height: "100%" }}>
               <Skeleton height={100} />
