@@ -2,29 +2,24 @@ package com.top.antibiotic.servcice;
 
 import com.top.antibiotic.data.BacteriaAntibiotic;
 import com.top.antibiotic.data.SuspectibleResistant;
-import com.top.antibiotic.dto.FratTableResponse;
-import com.top.antibiotic.dto.SusceptibilityChartRequest;
-import com.top.antibiotic.dto.SusceptibilityChartResponse;
-import com.top.antibiotic.entities.Antibiogram;
-import com.top.antibiotic.entities.Bacteria;
-import com.top.antibiotic.entities.Examination;
-import com.top.antibiotic.entities.Ward;
+import com.top.antibiotic.dto.*;
+import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.repository.AntibiogramRepository;
+import com.top.antibiotic.repository.AntibioticRepository;
 import com.top.antibiotic.repository.BacteriaRepository;
 import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.javatuples.KeyValue;
+import org.javatuples.Pair;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Service
@@ -35,26 +30,59 @@ public class ChartService {
 
     private final AntibiogramRepository antibiogramRepository;
     private final BacteriaRepository bacteriaRepository;
+    private final AntibioticRepository antibioticRepository;
 
-    public SusceptibilityChartResponse getSusceptibilityChartData(SusceptibilityChartRequest susceptibilityChartRequest) throws ParseException {
+    private final FratTableService fratTableService;
+
+    private Pair<List<String>, List<Date>> generateResponseKeys(
+            String firstValue, int startYear, int endYear) throws ParseException {
+        if (startYear > endYear) {
+            throw new AntibioticsException("wrong dates");
+        }
+        List<String> keys = new ArrayList<>();
+        keys.add(firstValue);
+
+        String pattern = "yy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        List<Date> dates = new ArrayList<>();
+        for (Integer i = startYear; i <= endYear; i++) {
+            dates.add(simpleDateFormat.parse(i + "-01-01"));
+            dates.add(simpleDateFormat.parse(i + "-12-31"));
+            keys.add(i.toString());
+        }
+
+        return new Pair<>(keys, dates);
+    }
+
+    private List<List<String>> generateValuesFromHashMap(
+            HashMap<String, List<String>> antibioResultsByYear
+    ) {
+        List<List<String>> values = new ArrayList<>();
+        for (String names: antibioResultsByYear.keySet()) {
+            List<String> antibioticData = new ArrayList<>();
+            antibioticData.add(names);
+            values.add(antibioticData);
+        }
+        int i = 0;
+        for (List<String> vals: antibioResultsByYear.values()) {
+            values.get(i).addAll(vals);
+            i++;
+        }
+
+        return values;
+    }
+
+    public SusceptibilityChartResponse getSusceptibilityChartData(
+            SusceptibilityChartRequest susceptibilityChartRequest) throws ParseException {
         Bacteria bacteria = bacteriaRepository.findByName(susceptibilityChartRequest.getBacteria())
                 .orElseThrow(() -> new AntibioticsException("no bacteria found with name: " +
                         susceptibilityChartRequest.getBacteria()));
 
         SusceptibilityChartResponse res = new SusceptibilityChartResponse();
 
-        List<String> keys = new ArrayList<String>();
-        keys.add("Nazwa");
-
-        String pattern = "yy-MM-dd";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        List<Date> dates = new ArrayList<>();
-        for (Integer i = 2019; i <= 2021; i++) {
-            dates.add(simpleDateFormat.parse(i + "-01-01"));
-            dates.add(simpleDateFormat.parse(i + "-12-31"));
-            keys.add(i.toString());
-        }
-        res.setKeys(keys);
+        var k = generateResponseKeys("Nazwa", 2019, 2021);
+        List<Date> dates = k.getValue1();
+        res.setKeys(k.getValue0());
 
         HashMap<String, List<String>> antibioResultsByYear = new HashMap<>();
 
@@ -130,27 +158,90 @@ public class ChartService {
             }
         }
 
-        List<List<String>> values = new ArrayList<>();
-        for (String names: antibioResultsByYear.keySet()) {
-            List<String> antibioticData = new ArrayList<>();
-            antibioticData.add(names);
-            values.add(antibioticData);
-        }
-        int i = 0;
-        for (List<String> vals: antibioResultsByYear.values()) {
-            values.get(i).addAll(vals);
-            i++;
-        }
-
-//        for (int i = 0; i < antibiotics.size(); i++) {
-//            List<String> antibioticData = new ArrayList<>();
-//            antibioticData.add(antibiotics.get(i));
-//            antibioticData.add(row.get(i));
-//            values.add(antibioticData);
-//        }
-
-        res.setResults(values);
+        res.setResults(generateValuesFromHashMap(antibioResultsByYear));
 
         return res;
+    }
+
+    private List<List<String>> generateValuesFromHashMapGraphChart(
+            HashMap<String, List<String>> antibioResultsByYear, List<String> antibiotics,
+            int noOfYears, Integer startYear
+    ) {
+        List<List<String>> values = new ArrayList<>();
+        if (noOfYears <= 0) {
+            return values;
+        }
+
+        for (int i = 0; i < noOfYears; i++) {
+            values.add(new ArrayList<>());
+            values.get(i).add(String.valueOf(startYear + i));
+        }
+
+        for (int i = 0; i < noOfYears; i++) {
+            for (String a : antibiotics) {
+                values.get(i).add(antibioResultsByYear.get(a).get(i));
+            }
+        }
+
+        return values;
+    }
+
+    public FRATChartsResponse getSusceptibilityFRATChartData(
+            SusceptibilityFRATChartRequest request) throws ParseException {
+
+        SusceptibilityChartResponse responseBarChart = new SusceptibilityChartResponse();
+        SusceptibilityChartResponse responseGraphChart = new SusceptibilityChartResponse();
+        responseGraphChart.setKeys(new ArrayList<>());
+        responseGraphChart.getKeys().add("Nazwa");
+
+        var k = generateResponseKeys("Nazwa",
+                request.getStartYear(),
+                request.getEndYear());
+        List<Date> dates = k.getValue1();
+        responseBarChart.setKeys(k.getValue0());
+
+        HashMap<String, List<String>> antibioResultsByYear = new HashMap<>();
+
+        List<Antibiotic> antibiotics = antibioticRepository.findAll();
+        List<String> antibioticsNames = new ArrayList<>();
+        List<List<String>> results = new ArrayList<>();
+
+        for (Antibiotic antibiotic : antibiotics) {
+            antibioResultsByYear.put(antibiotic.getName(),
+                    new ArrayList<>());
+            responseGraphChart.getKeys().add(antibiotic.getName());
+            antibioticsNames.add(antibiotic.getName());
+        }
+
+        for (int i = 0; i < dates.size(); i+=2) {
+            FratRequest fratRequest = FratRequest.builder()
+                    .startDate(dates.get(i))
+                    .endDate(dates.get(i+1))
+                    .material(request.getMaterial())
+                    .ward(request.getWard())
+                    .build();
+
+            FratTableResponse FRAT = fratTableService.getTable(fratRequest, false).getFirstTable();
+
+            for (String antibioticsName : antibioticsNames) {
+                if (FRAT.getResults().containsKey(antibioticsName)) {
+                    antibioResultsByYear.get(antibioticsName).add(
+                            String.valueOf(FRAT.getResults().get(antibioticsName)));
+                } else {
+                    antibioResultsByYear.get(antibioticsName).add("0");
+                }
+            }
+        }
+
+        responseBarChart.setResults(
+                generateValuesFromHashMap(antibioResultsByYear));
+
+        responseGraphChart.setResults(
+                generateValuesFromHashMapGraphChart(antibioResultsByYear,
+                        antibioticsNames, request.getEndYear() - request.getStartYear() + 1,
+                        request.getStartYear())
+        );
+
+        return new FRATChartsResponse(responseBarChart, responseGraphChart);
     }
 }

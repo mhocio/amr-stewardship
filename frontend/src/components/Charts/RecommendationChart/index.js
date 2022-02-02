@@ -57,7 +57,7 @@ const data = [
   },
 ];
 
-export default function RecommendationChart() {
+export default function RecommendationChart({ graphData }) {
 
   const [getPng, { ref: myRef }] = useCurrentPng();
   const handleDownload = useCallback(async () => {
@@ -66,6 +66,8 @@ export default function RecommendationChart() {
       FileSaver.saveAs(png, "wykres.png");
     }
   }, [getPng]);
+
+  console.log(graphData);
 
   return (
     <Grid container direction="column" spacing={3} wrap="nowrap">
@@ -76,7 +78,7 @@ export default function RecommendationChart() {
               ref={myRef}
               width={500}
               height={300}
-              data={data} ac
+              data={graphData}
               margin={{
                 top: 5,
                 right: 30,
@@ -85,12 +87,18 @@ export default function RecommendationChart() {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="Nazwa" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="pv" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+              {/* <Line type="monotone" dataKey="A1" stroke="#8884d8" activeDot={{ r: 8 }} />
+              <Line type="monotone" dataKey="A2" stroke="#82ca9d" /> */}
+
+              {
+                graphData[0] ? Object.keys(graphData[0]).map((key, index, arr) => (
+                  key != "Nazwa" ? <Line type="monotone" dataKey={key} stroke={"#000000".replace(/0/g, function () { return (~~(Math.random() * 16)).toString(16) })} /> : null)) : null
+              }
+
             </LineChart>
           </ResponsiveContainer>
         </Paper>

@@ -36,7 +36,8 @@ public class FratTableService {
 
     private final ExaminationRepository examinationRepository;
 
-    public SeveralFratTablesResponse getTable(FratRequest fratRequest) {
+    public SeveralFratTablesResponse getTable(FratRequest fratRequest, Boolean... flags) {
+        Boolean generateBothTables = flags.length > 0 ? flags[0] : true;
 
         // find Ward and Material from the request
         Ward ward = wardRepository.findByName(fratRequest.getWard())
@@ -129,9 +130,18 @@ public class FratTableService {
         int MAX_SEVERAL_ANTI = 3;
         int MIN_SEVERAL_ANTI = 2;
 
+        if (!generateBothTables) {
+            MAX_SEVERAL_ANTI = 0;
+            MIN_SEVERAL_ANTI = Integer.MAX_VALUE;
+        }
+
         // split antibiotics into tuples, triples, ...
         List<HashSet<String>> multipleAntibioticsList = new ArrayList<>();
         for (int i = MIN_SEVERAL_ANTI; i <= MAX_SEVERAL_ANTI; i++) {
+            if (i > antibiotics.size()) {
+                continue;
+            }
+
             Iterator<int[]> iterator = CombinatoricsUtils.combinationsIterator(
                     antibiotics.size(), i);
             while (iterator.hasNext()) {
@@ -188,6 +198,10 @@ public class FratTableService {
 
             List<HashSet<String>> multipleAntiInExamination = new ArrayList<>();
             for (int i = MIN_SEVERAL_ANTI; i <= MAX_SEVERAL_ANTI; i++) {
+                if (i > antibiotics.size()) {
+                    continue;
+                }
+
                 Iterator<int[]> tmpIterator = CombinatoricsUtils.combinationsIterator(
                         antibiotics.size(), i);
                 while (tmpIterator.hasNext()) {
@@ -298,6 +312,9 @@ public class FratTableService {
             rows.add(row);
             rows2.add(row2);
         }
+
+        res.setResults(resultSum);
+
         List<String> toAdd2 = new ArrayList<>();
         toAdd2.add("Razem:");
         toAdd2.add("100.00");
@@ -361,7 +378,7 @@ public class FratTableService {
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .forEachOrdered(x -> reverseSortedMapBacterias.put(x.getKey(), x.getValue()));
-        log.info(reverseSortedMapBacterias.toString());
+        //log.info(reverseSortedMapBacterias.toString());
 
         // SORT table by bacterias - by rows
         List<List<String>> sortedRowsByBacterias = new ArrayList<>();
@@ -381,7 +398,7 @@ public class FratTableService {
         rows.add(toAdd);
 
         res.setRows(rows);
-        //return severalAntibioticsFRAT;
+
         return new SeveralFratTablesResponse(res, severalAntibioticsFRAT);
     }
 }

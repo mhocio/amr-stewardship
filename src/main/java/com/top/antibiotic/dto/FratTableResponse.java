@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Data
@@ -15,5 +16,5 @@ public class FratTableResponse {
     public List<String> antibiotics;
     public List<String> bacterias;
     public List<List<String>> rows;
-    public List<String> results;
+    public HashMap<String, Double> results;
 }

@@ -1,9 +1,6 @@
 package com.top.antibiotic.controllers;
 
-import com.top.antibiotic.dto.FratRequest;
-import com.top.antibiotic.dto.FratTableResponse;
-import com.top.antibiotic.dto.SusceptibilityChartRequest;
-import com.top.antibiotic.dto.SusceptibilityChartResponse;
+import com.top.antibiotic.dto.*;
 import com.top.antibiotic.repository.*;
 import com.top.antibiotic.servcice.ChartService;
 import com.top.antibiotic.servcice.FratTableService;
@@ -33,6 +30,24 @@ public class ChartController {
                                 .bacteria(bacteria)
                                 .startYear(startDate)
                                 .endYear(endDate)
-                                .build()));
+                                .build())
+                );
+    }
+
+    @GetMapping(path = "/FRAT/{ward}/{material}/{startDate}/{endDate}")
+    public ResponseEntity<FRATChartsResponse> getChartFRATData(
+            @PathVariable String ward, @PathVariable String material,
+            @PathVariable Integer startDate, @PathVariable Integer endDate
+    ) throws ParseException {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(chartService.getSusceptibilityFRATChartData(
+                        SusceptibilityFRATChartRequest.builder()
+                                .ward(ward)
+                                .material(material)
+                                .startYear(startDate)
+                                .endYear(endDate)
+                                .build())
+                );
     }
 }
