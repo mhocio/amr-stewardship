@@ -27,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -127,6 +128,19 @@ public class AntibiogramTests {
         Assert.assertEquals("R", antibiogram.getMode());
         Assert.assertEquals("", antibiogram.getPryw());
 
+        MvcResult result = mvc.perform(get(uri))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(com.top.antibiotic.controllers.AntibiogramController.class))
+                .andExpect(handler().methodName("getAllAntibiograms"))
+                .andReturn();
+
+        result = mvc.perform(get(uri + "/by-pesel/69071102007"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(handler().handlerType(com.top.antibiotic.controllers.AntibiogramController.class))
+                .andExpect(handler().methodName("getAllByPesel"))
+                .andReturn();
     }
 
     @Test
