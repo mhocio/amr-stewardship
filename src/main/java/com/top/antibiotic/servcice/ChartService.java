@@ -80,7 +80,7 @@ public class ChartService {
 
         SusceptibilityChartResponse res = new SusceptibilityChartResponse();
 
-        var k = generateResponseKeys("Nazwa", 2019, 2021);
+        var k = generateResponseKeys("Nazwa", 2018, 2021);
         List<Date> dates = k.getValue1();
         res.setKeys(k.getValue0());
 

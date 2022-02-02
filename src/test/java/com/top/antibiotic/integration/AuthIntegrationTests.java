@@ -61,6 +61,114 @@ public class AuthIntegrationTests {
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Test
+    public void userExistsTest() throws Exception {
+        String email = "email@mail.com";
+        String password = "password";
+        String username = "username";
+
+        // REGISTER
+        String json = ow.writeValueAsString(
+                RegisterRequest.builder()
+                        .email(email)
+                        .password(password)
+                        .username(username)
+                        .build()
+        );
+        mvc.perform(post(uri + "/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(content().string("User Registration Successful"));
+
+        String email2 = "email@mail.com";
+        String password2 = "password";
+        String username2 = "user2";
+
+        // REGISTER
+        String json2 = ow.writeValueAsString(
+                RegisterRequest.builder()
+                        .email(email2)
+                        .password(password2)
+                        .username(username2)
+                        .build()
+        );
+        mvc.perform(post(uri + "/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json2))
+                .andDo(print())
+                .andExpect(status().is(409))
+                .andExpect(content().string("User already exists with email: email@mail.com"));
+
+        String email3 = "other_mail@mail.com";
+        String password3 = "password";
+        String username3 = "username";
+
+        // REGISTER
+        String json3 = ow.writeValueAsString(
+                RegisterRequest.builder()
+                        .email(email3)
+                        .password(password3)
+                        .username(username3)
+                        .build()
+        );
+        mvc.perform(post(uri + "/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json3))
+                .andDo(print())
+                .andExpect(status().is(409))
+                .andExpect(content().string("User already exists with username: username"));
+    }
+
+    @Test
+    public void loginFailedTest() throws Exception {
+        String email = "email@mail.com";
+        String password = "password";
+        String username = "username";
+
+        // REGISTER
+        String json = ow.writeValueAsString(
+                RegisterRequest.builder()
+                        .email(email)
+                        .password(password)
+                        .username(username)
+                        .build()
+        );
+        mvc.perform(post(uri + "/signup")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(content().string("User Registration Successful"));
+
+        json = ow.writeValueAsString(
+                LoginRequest.builder()
+                        .password(password)
+                        .username("some_username")
+                        .build()
+        );
+        MvcResult loginResult = mvc.perform(post(uri + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is(403))
+                .andReturn();
+
+        json = ow.writeValueAsString(
+                LoginRequest.builder()
+                        .password("wrong password")
+                        .username(username)
+                        .build()
+        );
+        loginResult = mvc.perform(post(uri + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andDo(print())
+                .andExpect(status().is(403))
+                .andReturn();
+    }
+
+    @Test
     public void postSignupTest() throws Exception {
         String email = "email@mail.com";
         String password = "password";
