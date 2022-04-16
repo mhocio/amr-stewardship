@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import java.util.Date;
@@ -24,7 +25,7 @@ public class Examination {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long examinationId;
 
-    @Column(unique=true)
+    //@Column(unique=true)
     private Long number;
 
     @ManyToOne(fetch = LAZY)
@@ -38,6 +39,12 @@ public class Examination {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "patientId", referencedColumnName = "patientId")
     private Patient patient;
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "examinationProviderId",
+            referencedColumnName = "examinationProviderId")
+    @NotNull(message = "Examination provider is required")
+    private ExaminationProvider examinationProvider;
 
     private Date orderDate;
 

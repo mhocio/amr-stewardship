@@ -82,4 +82,10 @@ public class AntibiogramController {
         antibiogramService.saveFromFile(reapExcelDataFile);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/import2")
+    public ResponseEntity mapReadExcelDataToDB2(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, ParseException {
+        antibiogramService.saveFromFileCGM(reapExcelDataFile);
+        return ResponseEntity.ok().build();
+    }
 }

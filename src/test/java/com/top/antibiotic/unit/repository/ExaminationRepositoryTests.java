@@ -4,8 +4,11 @@ import com.top.antibiotic.entities.*;
 import com.top.antibiotic.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +45,19 @@ public class ExaminationRepositoryTests {
     @Autowired
     PatientRepository patientRepository;
 
+    @Autowired
+    ExaminationProviderRepository examinationProviderRepository;
+
+    ExaminationProvider examinationProvider;
+
+    @Before
+    public void setup() {
+        if (examinationProvider == null)
+            examinationProvider = examinationProviderRepository.save(
+                ExaminationProvider.builder().name("ASSECO").build());
+        Assert.assertNotNull(examinationProvider);
+    }
+
     @Test
     @Transactional
     public void givenExamination_whenExistsByNumber_thenReturnTrue() throws ParseException {
@@ -68,6 +84,7 @@ public class ExaminationRepositoryTests {
                 .material(material)
                 .patient(patient)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
 
         examinationRepository.save(examination);
@@ -105,6 +122,7 @@ public class ExaminationRepositoryTests {
                 .material(material)
                 .patient(patient)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
 
         examinationRepository.save(examination);
@@ -147,6 +165,7 @@ public class ExaminationRepositoryTests {
                 .material(material1)
                 .patient(patient)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination1);
 
@@ -156,6 +175,7 @@ public class ExaminationRepositoryTests {
                 .material(material2)
                 .patient(patient)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination2);
 
@@ -203,6 +223,7 @@ public class ExaminationRepositoryTests {
                 .material(material)
                 .patient(patient1)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination1);
 
@@ -212,6 +233,7 @@ public class ExaminationRepositoryTests {
                 .material(material)
                 .patient(patient2)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination2);
 
@@ -259,6 +281,7 @@ public class ExaminationRepositoryTests {
                 .material(material1)
                 .patient(patient1)
                 .orderDate(orderDate)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination1);
 
@@ -267,6 +290,7 @@ public class ExaminationRepositoryTests {
                 .ward(ward)
                 .material(material2)
                 .patient(patient2)
+                .examinationProvider(examinationProvider)
                 .orderDate(orderDate)
                 .build();
         examinationRepository.save(examination2);
@@ -313,6 +337,7 @@ public class ExaminationRepositoryTests {
                 .ward(ward)
                 .material(material)
                 .patient(patient1)
+                .examinationProvider(examinationProvider)
                 .orderDate(orderDate1)
                 .build();
         examinationRepository.save(examination1);
@@ -323,6 +348,7 @@ public class ExaminationRepositoryTests {
                 .material(material)
                 .patient(patient2)
                 .orderDate(orderDate2)
+                .examinationProvider(examinationProvider)
                 .build();
         examinationRepository.save(examination2);
 

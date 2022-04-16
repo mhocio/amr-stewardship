@@ -13,5 +13,7 @@ public interface ExaminationMapper {
     @Mapping(target = "materialIdl", expression = "java(examination.getMaterial().getMaterialId())")
     @Mapping(target = "patientPesel", expression = "java(examination.getPatient().getPesel())")
     @Mapping(target = "patientId", expression = "java(examination.getPatient().getPatientId())")
+    @Mapping(target = "examinationProviderName", expression = "java(examination.getExaminationProvider().getName())")
+    @Mapping(target = "examinationProviderId", expression = "java(examination.getExaminationProvider().getExaminationProviderId())")
     ExaminationDto mapExaminationToDtoResponse(Examination examination);
 }

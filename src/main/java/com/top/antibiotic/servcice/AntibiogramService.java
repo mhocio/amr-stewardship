@@ -7,6 +7,7 @@ import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
 import com.top.antibiotic.mapper.AntibiogramMapper;
 import com.top.antibiotic.repository.*;
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
@@ -16,12 +17,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TransactionRequiredException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +45,7 @@ public class AntibiogramService {
     private final BacteriaRepository bacteriaRepository;
     private final AntibioticRepository antibioticRepository;
     private final ExaminationRepository examinationRepository;
+    private final ExaminationProviderRepository examinationProviderRepository;
 
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
@@ -76,8 +80,193 @@ public class AntibiogramService {
         return false;
     }
 
+    List<String> generateListOfItems(String s) {
+        return Arrays.asList(s.replaceAll("\\[", "")
+                .replaceAll("\\]", "").replaceAll(" ", "").split(","));
+    }
+
+    Ward parseWard(String name, Instant date) {
+        Ward ward;
+        try {
+            ward = wardRepository.findByName(name)
+                    .orElseThrow(() -> new AntibioticsException("No ward found"));
+        } catch (Exception e) {
+            ward = wardRepository.save(Ward.builder()
+                    .name(name)
+                    .createdDate(date)
+                    .build());
+        }
+        return ward;
+    }
+
+    Patient parsePatient(String firstName, String secondName, String pesel, Instant date) {
+        Patient patient;
+        try {
+            patient = patientRepository.findByPesel(pesel)
+                    .orElseThrow(() -> new AntibioticsException("No patient found"));
+        } catch (Exception e) {
+            patient = patientRepository.save(Patient.builder()
+                    .firstName(firstName)
+                    .secondName(secondName)
+                    .pesel(pesel)
+                    .createdDate(date)
+                    .build());
+        }
+        return patient;
+    }
+
+    Material parseMaterial(String materialName, Instant date) {
+        Material material;
+        try {
+            material = materialRepository.findByName(materialName)
+                    .orElseThrow(() -> new AntibioticsException("No material found"));
+        } catch (Exception e) {
+            material = materialRepository.save(Material.builder()
+                    .name(materialName)
+                    .createdDate(date)
+                    .build());
+        }
+        return material;
+    }
+
+    Bacteria parseBacteria(String name, String subtype, Instant date) {
+        Bacteria bacteria;
+        try {
+            bacteria = bacteriaRepository.findByName(name)
+                    .orElseThrow(() -> new AntibioticsException("No bacteria found"));
+        } catch (Exception e) {
+            bacteria = bacteriaRepository.save(Bacteria.builder()
+                    .name(name)
+                    .subtype(subtype)
+                    .createdDate(date)
+                    .build());
+        }
+        return bacteria;
+    }
+
+    Antibiotic parseAntibiotic(String name, String code, Instant date) {
+        Antibiotic antibiotic;
+        try {
+            antibiotic = antibioticRepository.findByName(name)
+                    .orElseThrow(() -> new AntibioticsException("No antibiotic found"));
+        } catch (Exception e) {
+            antibiotic = antibioticRepository.save(Antibiotic.builder()
+                    .name(name)
+                    .code(code)
+                    .createdDate(date)
+                    .build());
+        }
+        return antibiotic;
+    }
+
+    @Async
+    public void saveFromFileCGM(MultipartFile reapExcelDataFile) throws IOException, ParseException {
+        String providerName = "CGM";
+
+        Workbook workbook = StreamingReader.builder().rowCacheSize(100) // number of rows to keep in memory
+                .bufferSize(4096)
+                .open(reapExcelDataFile.getInputStream()); // InputStream or File for XLSX file (required)
+
+        Iterator<Row> rowIterator = workbook.getSheetAt(1).rowIterator();
+
+        // whether we insert this new Examination number this time
+        Set<Long> newExaminationNumbers = new HashSet<Long>();
+
+        ExaminationProvider examinationProvider = examinationProviderRepository.findByName(providerName);
+        if (examinationProvider == null) {
+            examinationProvider = examinationProviderRepository.save(ExaminationProvider.builder().name(providerName).build());
+        }
+
+        int rowNo = -1;
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            rowNo = rowNo + 1;
+            if (rowNo == 0) {
+                continue;
+            }
+
+            List<String> items = new ArrayList<>();
+            int cellIter = 0;
+            for (Cell c : row) {
+                if (cellIter == c.getColumnIndex()) {
+                    items.add(c.getStringCellValue());
+                } else {
+                    for (int ii = cellIter; ii < c.getColumnIndex(); ii++)
+                        items.add("");
+                    items.add(c.getStringCellValue());
+                    cellIter = c.getColumnIndex();
+                }
+                cellIter += 1;
+            }
+
+            Long examinationNumber = Long.parseLong(items.get(3));
+
+            // do not proceed if sb previously pushed this file or file with this Examination
+            if (!examinationRepository.existsByNumberAndExaminationProvider(
+                    examinationNumber, examinationProvider)) {
+                newExaminationNumbers.add(examinationNumber);
+            }
+            if (!newExaminationNumbers.contains(examinationNumber)) {
+                continue;
+            }
+
+            Instant date = Instant.now();
+
+            Ward ward = parseWard(items.get(1), date);
+            Patient patient = parsePatient(items.get(19), items.get(18), items.get(21), date);
+            Bacteria bacteria = parseBacteria(items.get(10), null, date);
+            Material material = parseMaterial(items.get(14), date);
+
+            Examination examination;
+            String pattern = "yy-MM-dd";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            Date dateInserted = simpleDateFormat.parse(items.get(2));
+            try {
+                examination = examinationRepository.findByNumberAndExaminationProvider(
+                                examinationNumber, examinationProvider)
+                        .orElseThrow(() -> new AntibioticsException("No Order found"));
+            } catch (Exception e) {
+                examination = examinationRepository.save(Examination.builder()
+                        .number(examinationNumber)
+                        .ward(ward)
+                        .material(material)
+                        .patient(patient)
+                        .examinationProvider(examinationProvider)
+                        .orderDate(dateInserted)
+                        .build());
+            }
+
+            for (String resistantAntibioticName : generateListOfItems(items.get(15))) {
+                if (resistantAntibioticName.isEmpty())
+                    continue;
+                Antibiogram antibiogram = new Antibiogram();
+                antibiogram.setWard(ward);
+                antibiogram.setCreatedDate(date);
+                antibiogram.setPatient(patient);
+                antibiogram.setOrderDate(dateInserted);
+                antibiogram.setMaterial(material);
+                antibiogram.setBacteria(bacteria);
+                Antibiotic antibiotic = parseAntibiotic(resistantAntibioticName, null, date);
+                antibiogram.setAntibiotic(antibiotic);
+                antibiogram.setSusceptibility("R");
+
+                antibiogram.setExamination(examination);
+                antibiogramRepository.save(antibiogram);
+            }
+            try {
+                em.flush();
+                em.clear();
+            } catch (TransactionRequiredException e) {
+
+            }
+        }
+    }
+
+    //@Async
     @Transactional()
     public void saveFromFile(MultipartFile reapExcelDataFile) throws IOException, ParseException {
+
+        String providerName = "ASSECO";
 
         Workbook workbook = StreamingReader.builder().rowCacheSize(100) // number of rows to keep in memory
                 .bufferSize(4096)
@@ -89,6 +278,11 @@ public class AntibiogramService {
         Set<Long> newExaminationNumbers = new HashSet<Long>();
 
         List<Antibiogram> toInsert = new ArrayList<>();
+
+        ExaminationProvider examinationProvider = examinationProviderRepository.findByName(providerName);
+        if (examinationProvider == null) {
+            examinationProvider = examinationProviderRepository.save(ExaminationProvider.builder().name(providerName).build());
+        }
 
         int rowNo = -1;
         while (rowIterator.hasNext()) {
@@ -128,37 +322,18 @@ public class AntibiogramService {
             }
 
             // do not proceed if sb previously pushed this file or file with this Examination
-            if (!examinationRepository.existsByNumber(Long.parseLong(items.get(5)))) {
+            if (!examinationRepository.existsByNumberAndExaminationProvider(
+                    Long.parseLong(items.get(5)), examinationProvider)) {
                 newExaminationNumbers.add(Long.parseLong(items.get(5)));
             }
             if (!newExaminationNumbers.contains(Long.parseLong(items.get(5)))) {
                 continue;
             }
 
-            Ward ward;
-            try {
-                ward = wardRepository.findByName(items.get(0))
-                        .orElseThrow(() -> new AntibioticsException("No ward found"));
-            } catch (Exception e) {
-                ward = wardRepository.save(Ward.builder()
-                        .name(items.get(0))
-                        .createdDate(date)
-                        .build());
-            }
+            Ward ward = parseWard(items.get(0), date);
             antibiogram.setWard(ward);
 
-            Patient patient;
-            try {
-                patient = patientRepository.findByPesel(items.get(3))
-                        .orElseThrow(() -> new AntibioticsException("No patient found"));
-            } catch (Exception e) {
-                patient = patientRepository.save(Patient.builder()
-                        .firstName(items.get(1))
-                        .secondName(items.get(2))
-                        .pesel(items.get(3))
-                        .createdDate(date)
-                        .build());
-            }
+            Patient patient = parsePatient(items.get(1), items.get(2), items.get(3), date);
             antibiogram.setPatient(patient);
 
             String pattern = "MM/dd/yy";
@@ -168,47 +343,19 @@ public class AntibiogramService {
 
             antibiogram.setOrderNumber(Long.parseLong(items.get(5)));
 
-            Material material;
-            try {
-                material = materialRepository.findByName(items.get(6))
-                        .orElseThrow(() -> new AntibioticsException("No material found"));
-            } catch (Exception e) {
-                material = materialRepository.save(Material.builder()
-                        .name(items.get(6))
-                        .createdDate(date)
-                        .build());
-            }
+            Material material = parseMaterial(items.get(6), date);
             antibiogram.setMaterial(material);
 
-            Bacteria bacteria;
-            try {
-                bacteria = bacteriaRepository.findByName(items.get(7))
-                        .orElseThrow(() -> new AntibioticsException("No bacteria found"));
-            } catch (Exception e) {
-                bacteria = bacteriaRepository.save(Bacteria.builder()
-                        .name(items.get(7))
-                        .subtype(items.get(8))
-                        .createdDate(date)
-                        .build());
-            }
+            Bacteria bacteria = parseBacteria(items.get(7), items.get(8), date);
             antibiogram.setBacteria(bacteria);
 
-            Antibiotic antibiotic;
-            try {
-                antibiotic = antibioticRepository.findByName(items.get(9))
-                        .orElseThrow(() -> new AntibioticsException("No antibiotic found"));
-            } catch (Exception e) {
-                antibiotic = antibioticRepository.save(Antibiotic.builder()
-                        .name(items.get(9))
-                        .code(items.get(22))
-                        .createdDate(date)
-                        .build());
-            }
+            Antibiotic antibiotic = parseAntibiotic(items.get(9), items.get(22), date);
             antibiogram.setAntibiotic(antibiotic);
 
             Examination examination;
             try {
-                examination = examinationRepository.findByNumber(Long.parseLong(items.get(5)))
+                examination = examinationRepository.findByNumberAndExaminationProvider(
+                        Long.parseLong(items.get(5)), examinationProvider)
                         .orElseThrow(() -> new AntibioticsException("No Order found"));
             } catch (Exception e) {
                 examination = examinationRepository.save(Examination.builder()
@@ -216,6 +363,7 @@ public class AntibiogramService {
                         .ward(ward)
                         .material(material)
                         .patient(patient)
+                        .examinationProvider(examinationProvider)
                         .orderDate(dateInserted)
                         .build());
             }
@@ -263,5 +411,6 @@ public class AntibiogramService {
 //            em.flush();
 //            em.clear();
 //        }
+        log.info("done...");
     }
 }

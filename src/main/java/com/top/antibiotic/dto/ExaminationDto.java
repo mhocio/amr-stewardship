@@ -24,5 +24,8 @@ public class ExaminationDto {
     private String patientPesel;
     private Long patientId;
 
+    private String examinationProviderName;
+    private Long examinationProviderId;
+
     private Date orderDate;
 }
