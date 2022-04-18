@@ -1,35 +1,74 @@
 import React, { useState, useEffect, useRef } from "react";
+
 // material-ui
-import { Grid, Paper, Button } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
+import {
+  Grid,
+  Paper,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from "@mui/material";
 
 // project imports
 import PatientsTable from "../components/Tables/PatientsTable";
 import ExamTable from "../components/Tables/ExamTable";
 import BASE_URL from "../constants/BASE_URL";
 import { DrawerHeader } from "../styledComponents/StyledDrawerHeader";
-import axios from "../services/interceptor";
-
 import { useLoading } from "../loading/loading-context";
-
 import authHeader from "../services/auth-header";
+import axios from "../services/interceptor";
+import MySelect from "../components/Forms/Select";
+
+// third-party
+import { Formik, Form } from "formik";
+import * as Yup from "yup";
+
 
 const PatientsPage = () => {
   const [patients, setPatients] = useState([]);
   const [antibiograms, setAntibiograms] = useState([]);
   const { loading, setLoading } = useLoading();
   const uploadInputRef = useRef(null);
+  const [open, setOpen] = React.useState(false);
 
+  const [antibiogramType, setAntibiogramType] = React.useState("");
+
+  const antibiogramTypeOptions = [
+    { antibiogramTypeId: 1, name: "CGM" },
+    { antibiogramTypeId: 2, name: "ASSECO" }
+  ];
+
+  const initialValues = {
+    antibiogramType: ""
+  };
+
+  const validationSchema = Yup.object({
+    antibiogramType: Yup.string().required("Rodzaj danych jest wymagany"),
+  });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason !== "backdropClick") {
+      setOpen(false);
+    }
+  };
 
   const handlePatientAntibiograms = (params) => {
     setAntibiograms(params);
   };
 
-  const handleClick = event => {
+  const handleClick = (event) => {
     uploadInputRef.current.click();
     console.log("handled click");
+    handleClose();
   };
-  const handleChange = event => {
+
+  const handleChange = (event) => {
     handleImportData(event.target.files[0]);
     console.log("handled change");
   };
@@ -43,9 +82,9 @@ const PatientsPage = () => {
     console.log(blob);
     setLoading(true);
     const formData = new FormData();
-    formData.append('file', blob);
+    formData.append("file", blob);
     axios
-      .post(`${BASE_URL}/antibiogram/import`, formData, {
+      .post(`${BASE_URL}/antibiogram/import/${antibiogramType}`, formData, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -54,11 +93,10 @@ const PatientsPage = () => {
         }
       })
       .then((res) => {
-        console.log(res)
-        
+        console.log(res);
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
       })
       .finally(() => {
         getTablesData();
@@ -136,19 +174,69 @@ const PatientsPage = () => {
             margin: "25px"
           }}
         >
-          <input
-            ref={uploadInputRef}
-            type="file"
-            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            style={{ display: "none" }}
-            onChange={handleChange}
-          />
-          <Button
-            onClick={handleClick}
-            variant="contained"
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            validateOnBlur={false}
+            validateOnChange
           >
-            Importuj antybiogramy
-          </Button>
+            {({ isSubmitting, dirty, setFieldValue }) => (
+              <Form>
+                <Button onClick={handleClickOpen} variant="contained">
+                  Importuj antybiogramy
+                </Button>
+                <Dialog
+                  maxWidth="xs"
+                  fullWidth
+                  disableEscapeKeyDown
+                  open={open}
+                  onClose={handleClose}
+                >
+                  <DialogTitle>Import danych</DialogTitle>
+                  <DialogContent
+                    sx={{ alignItems: "center", justifyContent: "center" }}
+                  >
+                    <Grid
+                      container
+                      direction="row"
+                      spacing={1}
+                      wrap="nowrap"
+                      justifyContent="center"
+                      alignItems="center"
+                      sx={{ paddingTop: "10px" }}
+                    >
+                      <Grid item>
+                        <MySelect
+                          name="antibiogramType"
+                          label="Typ danych"
+                          sx={{ width: "200px" }}
+                          onClick={(e)=>setAntibiogramType(e.target.textContent.toLowerCase())} // <Formik/> doesn't support onChange XD - 16.04.2022
+                          options={antibiogramTypeOptions.map((item, index) => (
+                            <option key={index} value={item.name}>
+                              {item.name}
+                            </option>
+                          ))}
+                        />
+                      </Grid>
+                    </Grid>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={handleClose}>Zamknij</Button>
+                    <Button onClick={handleClick} variant="contained">
+                      Importuj
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                <input
+                  ref={uploadInputRef}
+                  type="file"
+                  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  style={{ display: "none" }}
+                  onChange={handleChange}
+                />
+              </Form>
+            )}
+          </Formik>
         </Paper>
       </Grid>
     </>
