@@ -20,7 +20,10 @@ export default function FratTablePlaceholder() {
     >
       <Grid container justifyContent="center" alignItems="center">
         <Grid item>
-          <Typography variant="caption">Naciśnij przycisk aby uzyskać analizę dla wybranych powyżej informacji.</Typography>
+          <Typography variant="caption">
+            Naciśnij przycisk aby uzyskać analizę dla wybranych powyżej
+            informacji.
+          </Typography>
         </Grid>
       </Grid>
     </Box>

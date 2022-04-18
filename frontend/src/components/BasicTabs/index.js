@@ -7,12 +7,10 @@ import { Tabs, Tab, Box, Grid, Paper } from '@mui/material';
 // project imports
 import SusceptibilityChart from '../Charts/SusceptibilityChart';
 import RecommendationChart from '../Charts/RecommendationChart';
-import DosageChart from '../Charts/DosageChart';
-import AntibioticGroupSelect from '../AntibioticGroupSelect';
-import BacteriaSelect from '../BacteriaSelect';
-import MaterialSelect from '../MaterialSelect';
-import WardSelect from '../WardSelect';
-import YearSelect from '../YearSelect';
+import BacteriaSelect from '../Selects/BacteriaSelect';
+import MaterialSelect from '../Selects/MaterialSelect';
+import WardSelect from '../Selects/WardSelect';
+import YearSelect from '../Selects/YearSelect';
 import BASE_URL from '../../constants/BASE_URL';
 import authHeader from "../../services/auth-header";
 import { useLoading } from "../../loading/loading-context";
@@ -23,7 +21,6 @@ import axios from 'axios';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
-
 
   return (
     <div
@@ -170,7 +167,6 @@ export default function BasicTabs() {
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs" centered>
             <Tab label="Lekowrażliwość drobnoustrojów" {...a11yProps(0)} />
             <Tab label="FRAT" {...a11yProps(1)} />
-            {/* <Tab label="DDD/1000 osobodni hospitalizacji" {...a11yProps(2)} /> */}
           </Tabs>
         </Paper>
       </Box>
@@ -213,22 +209,7 @@ export default function BasicTabs() {
             <RecommendationChart graphData={graphChartData} />
           </Grid>
         </Grid>
-        
       </TabPanel>
-      {/* <TabPanel value={value} index={2}>
-        <Grid container direction="row" spacing={2} wrap="nowrap">
-          <Grid item xs={9}>
-            <RecommendationChart materialChartData={materialChartData} />
-          </Grid>
-          <Grid item xs={3}>
-            <Grid container direction="column" spacing={3} wrap="nowrap">
-              <Grid item>
-                <MaterialSelect handleSetMaterial={handleSetMaterial} />
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </TabPanel> */}
     </Box>
   );
 }

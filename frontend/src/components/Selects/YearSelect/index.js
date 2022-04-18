@@ -4,8 +4,8 @@ import * as React from "react";
 import { Autocomplete, Paper, TextField } from "@mui/material";
 
 // project imports
-import BASE_URL from "../../constants/BASE_URL";
-import authHeader from "../../services/auth-header";
+import BASE_URL from "../../../constants/BASE_URL";
+import authHeader from "../../../services/auth-header";
 
 // third-party
 import dayjs from "dayjs";

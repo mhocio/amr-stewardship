@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
+
+// material-ui
+import { Button, Grid } from "@mui/material";
+
+// third-party
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import * as dayjs from "dayjs";
 import axios from "axios";
 
-// material-ui
-import { Button, Grid } from "@mui/material";
-
 // project imports
 import MyDatePicker from "../Forms/DatePicker";
 import AnalyzeButton from "../Forms/Button";
 import MySelect from "../Forms/Select";
-
 import BASE_URL from "../../constants/BASE_URL";
 import authHeader from "../../services/auth-header";
 import { useLoading } from "../../loading/loading-context";
@@ -94,20 +95,23 @@ export default function FratMenu({ handleSetFratData }) {
       onSubmit={(values) => {
         setLoading(true);
         axios
-          .get(`${BASE_URL}/frat-table/${values.ward}/${values.material}?startDate=${values.startDate}&endDate=${values.endDate}`, {
-            method: "GET",
-            mode: "cors",
-            headers: {
-              Accept: "application/json, text/plain",
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-              ...authHeader()
+          .get(
+            `${BASE_URL}/frat-table/${values.ward}/${values.material}?startDate=${values.startDate}&endDate=${values.endDate}`,
+            {
+              method: "GET",
+              mode: "cors",
+              headers: {
+                Accept: "application/json, text/plain",
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                ...authHeader()
+              }
             }
-          })
+          )
           .then(console.log(values))
           .then((res) => {
-            console.log(res.data)
-            handleSetFratData(res.data)
+            console.log(res.data);
+            handleSetFratData(res.data);
           })
           .finally(() => {
             setLoading(false);

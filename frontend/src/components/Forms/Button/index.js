@@ -1,31 +1,32 @@
-import React from 'react';
+import React from "react";
 
 // material-ui
-import { LoadingButton } from '@mui/lab';
+import { LoadingButton } from "@mui/lab";
 
 // third-party
-import { useFormikContext } from 'formik';
+import { useFormikContext } from "formik";
 
 const ButtonWrapper = ({ children, loading, ...otherProps }) => {
-
   const { submitForm } = useFormikContext();
 
   const handleSubmit = () => {
     submitForm();
-  }
+  };
 
   const configButton = {
-    variant: 'contained',
+    variant: "contained",
     onClick: handleSubmit,
-    color: 'primary',
-    size: 'large',
-  }
+    color: "primary",
+    size: "large"
+  };
 
   return (
-    <LoadingButton {...configButton}
-    loadingPosition="end"
-    endIcon={otherProps.icon}
-    loading={loading}>
+    <LoadingButton
+      {...configButton}
+      loadingPosition="end"
+      endIcon={otherProps.icon}
+      loading={loading}
+    >
       {children}
     </LoadingButton>
   );
