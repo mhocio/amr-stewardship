@@ -1,7 +1,6 @@
 package com.top.antibiotic.servcice;
 
 import com.monitorjbl.xlsx.StreamingReader;
-import com.top.antibiotic.data.AntibiogramRow;
 import com.top.antibiotic.dto.AntibiogramResponse;
 import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
@@ -11,7 +10,6 @@ import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -50,6 +48,8 @@ public class AntibiogramService {
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
 
+    private final Boolean SKIP_DUPLICATE_EXAMINATION = true;
+
     @Transactional(readOnly = true)
     public List<AntibiogramResponse> getAll() {
         return antibiogramRepository.findAll()
@@ -75,9 +75,7 @@ public class AntibiogramService {
     }
 
     Boolean parseStringToBoolean(String s) {
-        if (s.startsWith("T") || s.startsWith("1") || s.startsWith("t"))
-            return true;
-        return false;
+        return s.startsWith("T") || s.startsWith("1") || s.startsWith("t");
     }
 
     List<String> generateListOfItems(String s) {
@@ -159,7 +157,32 @@ public class AntibiogramService {
         return antibiotic;
     }
 
-    @Async
+    private void parseAntibiogram(String resistantAntibioticName, String suspectability,
+                                     Ward ward, Instant date, Patient patient, Date dateInserted,
+                                     Material material, Bacteria bacteria, Examination examination) {
+        if (!suspectability.equals("R") && !suspectability.equals("I") && !suspectability.equals("S")) {
+            throw new RuntimeException("wrong suspectability type");
+        }
+
+        if (resistantAntibioticName.isEmpty())
+            return;
+        Antibiogram antibiogram = new Antibiogram();
+        antibiogram.setWard(ward);
+        antibiogram.setCreatedDate(date);
+        antibiogram.setPatient(patient);
+        antibiogram.setOrderDate(dateInserted);
+        antibiogram.setMaterial(material);
+        antibiogram.setBacteria(bacteria);
+        Antibiotic antibiotic = parseAntibiotic(resistantAntibioticName, null, date);
+        antibiogram.setAntibiotic(antibiotic);
+        antibiogram.setSusceptibility(suspectability);
+
+        antibiogram.setExamination(examination);
+        antibiogramRepository.save(antibiogram);
+    }
+
+    //@Async
+    @Transactional
     public void saveFromFileCGM(MultipartFile reapExcelDataFile) throws IOException, ParseException {
         String providerName = "CGM";
 
@@ -185,29 +208,19 @@ public class AntibiogramService {
                 continue;
             }
 
-            List<String> items = new ArrayList<>();
-            int cellIter = 0;
-            for (Cell c : row) {
-                if (cellIter == c.getColumnIndex()) {
-                    items.add(c.getStringCellValue());
-                } else {
-                    for (int ii = cellIter; ii < c.getColumnIndex(); ii++)
-                        items.add("");
-                    items.add(c.getStringCellValue());
-                    cellIter = c.getColumnIndex();
-                }
-                cellIter += 1;
-            }
+            List<String> items = extractRow(row);
 
             Long examinationNumber = Long.parseLong(items.get(3));
 
-            // do not proceed if sb previously pushed this file or file with this Examination
-            if (!examinationRepository.existsByNumberAndExaminationProvider(
-                    examinationNumber, examinationProvider)) {
-                newExaminationNumbers.add(examinationNumber);
-            }
-            if (!newExaminationNumbers.contains(examinationNumber)) {
-                continue;
+            if (SKIP_DUPLICATE_EXAMINATION) {
+                // do not proceed if sb previously pushed this file or file with this Examination
+                if (!examinationRepository.existsByNumberAndExaminationProvider(
+                        examinationNumber, examinationProvider)) {
+                    newExaminationNumbers.add(examinationNumber);
+                }
+                if (!newExaminationNumbers.contains(examinationNumber)) {
+                    continue;
+                }
             }
 
             Instant date = Instant.now();
@@ -237,29 +250,39 @@ public class AntibiogramService {
             }
 
             for (String resistantAntibioticName : generateListOfItems(items.get(15))) {
-                if (resistantAntibioticName.isEmpty())
-                    continue;
-                Antibiogram antibiogram = new Antibiogram();
-                antibiogram.setWard(ward);
-                antibiogram.setCreatedDate(date);
-                antibiogram.setPatient(patient);
-                antibiogram.setOrderDate(dateInserted);
-                antibiogram.setMaterial(material);
-                antibiogram.setBacteria(bacteria);
-                Antibiotic antibiotic = parseAntibiotic(resistantAntibioticName, null, date);
-                antibiogram.setAntibiotic(antibiotic);
-                antibiogram.setSusceptibility("R");
-
-                antibiogram.setExamination(examination);
-                antibiogramRepository.save(antibiogram);
+                parseAntibiogram(resistantAntibioticName, "R", ward, date, patient,
+                        dateInserted, material, bacteria, examination);
+            }
+            for (String resistantAntibioticName : generateListOfItems(items.get(16))) {
+                parseAntibiogram(resistantAntibioticName, "I", ward, date, patient,
+                        dateInserted, material, bacteria, examination);
+            }
+            for (String resistantAntibioticName : generateListOfItems(items.get(17))) {
+                parseAntibiogram(resistantAntibioticName, "S", ward, date, patient,
+                        dateInserted, material, bacteria, examination);
             }
             try {
                 em.flush();
                 em.clear();
-            } catch (TransactionRequiredException e) {
-
-            }
+            } catch (TransactionRequiredException e) {}
         }
+    }
+
+    private List<String> extractRow(Row row) {
+        List<String> items = new ArrayList<>();
+        int cellIter = 0;
+        for (Cell c : row) {
+            if (cellIter == c.getColumnIndex()) {
+                items.add(c.getStringCellValue());
+            } else {
+                for (int ii = cellIter; ii < c.getColumnIndex(); ii++)
+                    items.add("");
+                items.add(c.getStringCellValue());
+                cellIter = c.getColumnIndex();
+            }
+            cellIter += 1;
+        }
+        return items;
     }
 
     //@Async
@@ -289,7 +312,7 @@ public class AntibiogramService {
             Row row = rowIterator.next();
             rowNo = rowNo + 1;
             if (rowNo == 0) {
-                continue;
+                continue;  // skip header row
             }
 
             Instant date = Instant.now();
@@ -297,37 +320,25 @@ public class AntibiogramService {
             Antibiogram antibiogram = new Antibiogram();
             antibiogram.setCreatedDate(date);
 
-            List<String> items = new ArrayList<>();
-
-            int cellIter = 0;
-            for (Cell c : row) {
-                if (cellIter == c.getColumnIndex()) {
-                    items.add(c.getStringCellValue());
-                } else {
-                    for (int ii = cellIter; ii < c.getColumnIndex(); ii++)
-                        items.add("");
-                    items.add(c.getStringCellValue());
-                    cellIter = c.getColumnIndex();
-                }
-                cellIter += 1;
-                //log.info(String.valueOf(c.getColumnIndex()));
-            }
+            List<String> items = extractRow(row);
 
             if (items.size() == 26) {
-                items.add("");
+                items.add("");  // sometimes last column is null
             }
 
             if (items.size() < 27) {
                 continue;
             }
 
-            // do not proceed if sb previously pushed this file or file with this Examination
-            if (!examinationRepository.existsByNumberAndExaminationProvider(
-                    Long.parseLong(items.get(5)), examinationProvider)) {
-                newExaminationNumbers.add(Long.parseLong(items.get(5)));
-            }
-            if (!newExaminationNumbers.contains(Long.parseLong(items.get(5)))) {
-                continue;
+            if (SKIP_DUPLICATE_EXAMINATION) {
+                // do not proceed if sb previously pushed this file or file with this Examination
+                if (!examinationRepository.existsByNumberAndExaminationProvider(
+                        Long.parseLong(items.get(5)), examinationProvider)) {
+                    newExaminationNumbers.add(Long.parseLong(items.get(5)));
+                }
+                if (!newExaminationNumbers.contains(Long.parseLong(items.get(5)))) {
+                    continue;
+                }
             }
 
             Ward ward = parseWard(items.get(0), date);
@@ -401,8 +412,10 @@ public class AntibiogramService {
 //            }
 
             Antibiogram savedAntibiogram = antibiogramRepository.save(antibiogram);
-            em.flush();
-            em.clear();
+            try {
+                em.flush();
+                em.clear();
+            } catch (TransactionRequiredException e) {}
         }
 
 //        if (toInsert.size() > 0) {
