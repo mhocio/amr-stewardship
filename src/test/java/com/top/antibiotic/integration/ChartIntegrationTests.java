@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@ActiveProfiles({"tests", "dev"})
+@ActiveProfiles({"tests", "dev", "synchronous-tests"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -42,7 +42,7 @@ public class ChartIntegrationTests {
     private MockMvc mvc;
 
     private final String uri = "/api/chart";
-    private final String importAntibiogramsUri = "/api/antibiogram/import";
+    private final String importAntibiogramsUri = "/api/antibiogram/import/asseco";
     private final ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Test

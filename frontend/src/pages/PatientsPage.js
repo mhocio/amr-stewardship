@@ -20,9 +20,10 @@ import { useLoading } from "../loading/loading-context";
 import authHeader from "../services/auth-header";
 import axios from "../services/interceptor";
 import MySelect from "../components/Forms/Select";
+import TextfieldWrapper from "../components/Forms/Textfield";
 
 // third-party
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext} from "formik";
 import * as Yup from "yup";
 
 
@@ -34,6 +35,7 @@ const PatientsPage = () => {
   const [open, setOpen] = React.useState(false);
 
   const [antibiogramType, setAntibiogramType] = React.useState("");
+  const [sheetNumber, setSheetNumber] = React.useState("");
 
   const antibiogramTypeOptions = [
     { antibiogramTypeId: 1, name: "CGM" },
@@ -41,11 +43,13 @@ const PatientsPage = () => {
   ];
 
   const initialValues = {
-    antibiogramType: ""
+    antibiogramType: "",
+    sheetNumber: 0
   };
 
   const validationSchema = Yup.object({
     antibiogramType: Yup.string().required("Rodzaj danych jest wymagany"),
+    sheetNumber: Yup.number()
   });
 
   const handleClickOpen = () => {
@@ -77,14 +81,25 @@ const PatientsPage = () => {
     getTablesData();
   }, []);
 
+  const FormObserver = () => {
+    const { values } = useFormikContext();
+    useEffect(() => {
+      //console.log("FormObserver::values", values);
+      setSheetNumber(values.sheetNumber);
+    }, [values]);
+    return null;
+  };
+
   const handleImportData = (blob) => {
-    console.log("start file upload");
-    console.log(blob);
+    // console.log("start file upload");
+    // console.log(blob);
+    // console.log("sheetNumber: " + sheetNumber);
+    // console.debug(`${BASE_URL}/antibiogram/import/${antibiogramType}?sheetNumber=${sheetNumber}`);
     setLoading(true);
     const formData = new FormData();
     formData.append("file", blob);
     axios
-      .post(`${BASE_URL}/antibiogram/import/${antibiogramType}`, formData, {
+      .post(`${BASE_URL}/antibiogram/import/${antibiogramType}?sheetNumber=${sheetNumber}`, formData, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -94,6 +109,8 @@ const PatientsPage = () => {
       })
       .then((res) => {
         console.log(res);
+        if (res.status == 200)
+          alert(`Import pliku ${blob.name} rozpoczęty jako format ${antibiogramType}`);
       })
       .catch((err) => {
         console.log(err);
@@ -101,6 +118,7 @@ const PatientsPage = () => {
       .finally(() => {
         getTablesData();
         setLoading(false);
+        uploadInputRef.current.value = null;
       });
   };
 
@@ -182,6 +200,7 @@ const PatientsPage = () => {
           >
             {({ isSubmitting, dirty, setFieldValue }) => (
               <Form>
+                <FormObserver />
                 <Button onClick={handleClickOpen} variant="contained">
                   Importuj antybiogramy
                 </Button>
@@ -202,7 +221,7 @@ const PatientsPage = () => {
                       spacing={1}
                       wrap="nowrap"
                       justifyContent="center"
-                      alignItems="center"
+                      alignItems="stretch"
                       sx={{ paddingTop: "10px" }}
                     >
                       <Grid item>
@@ -218,6 +237,16 @@ const PatientsPage = () => {
                           ))}
                         />
                       </Grid>
+                      <Grid item>
+                        <TextfieldWrapper
+                          name="sheetNumber"
+                          label="Numer arkusza"
+                          type="number"
+                          id="sheetNumber"
+                          sx={{ width: "200px" }}
+                        />
+                      </Grid>
+
                     </Grid>
                   </DialogContent>
                   <DialogActions>

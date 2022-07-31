@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class AntibiogramController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AntibiogramResponse> getById(Long id) {
+    public ResponseEntity<AntibiogramResponse> getById(@PathVariable Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(antibiogramService.getAntibiogramsById(id));
@@ -77,15 +78,17 @@ public class AntibiogramController {
                 );
     }
 
-    @PostMapping("/import")
-    public ResponseEntity mapReapExcelDatatoDB(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, ParseException {
-        antibiogramService.saveFromFile(reapExcelDataFile);
+    @PostMapping("/import/asseco")
+    public ResponseEntity mapReapExcelDataToDB(@RequestParam("file") MultipartFile readExcelDataFile,
+                                               @RequestParam(required = false) Optional<Integer> sheetNumber) throws IOException, ParseException {
+        antibiogramService.saveFromFile(new ByteArrayResource(readExcelDataFile.getBytes()), sheetNumber);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/import2")
-    public ResponseEntity mapReadExcelDataToDB2(@RequestParam("file") MultipartFile reapExcelDataFile) throws IOException, ParseException {
-        antibiogramService.saveFromFileCGM(reapExcelDataFile);
+    @PostMapping("/import/cgm")
+    public ResponseEntity mapReadExcelDataToDB2(@RequestParam("file") MultipartFile readExcelDataFile,
+                                                @RequestParam(required = false) Optional<Integer> sheetNumber) throws IOException, ParseException {
+        antibiogramService.saveFromFileCGM(new ByteArrayResource(readExcelDataFile.getBytes()), sheetNumber);
         return ResponseEntity.ok().build();
     }
 }

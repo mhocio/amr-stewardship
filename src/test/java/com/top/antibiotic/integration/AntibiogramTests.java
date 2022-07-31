@@ -42,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@ActiveProfiles({"tests"})
+@ActiveProfiles({"tests", "synchronous-tests"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -80,7 +80,7 @@ public class AntibiogramTests {
                 , fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 , new ClassPathResource(fileName).getInputStream());
 
-        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import")
+        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import/asseco")
                         .file(file))
                 .andExpect(status().is(200));
 
@@ -153,7 +153,7 @@ public class AntibiogramTests {
                 , fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 , new ClassPathResource(fileName).getInputStream());
 
-        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import")
+        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import/asseco")
                         .file(file))
                 .andExpect(status().is(200));
 
@@ -175,7 +175,7 @@ public class AntibiogramTests {
                 , fileName, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 , new ClassPathResource(fileName).getInputStream());
 
-        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import")
+        mvc.perform(MockMvcRequestBuilders.multipart(uri + "/import/asseco")
                         .file(file))
                 .andExpect(status().is(200));
 
