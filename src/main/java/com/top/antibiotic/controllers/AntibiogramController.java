@@ -74,14 +74,16 @@ public class AntibiogramController {
     @PostMapping("/import/asseco")
     public ResponseEntity mapReapExcelDataToDB(@RequestParam("file") MultipartFile readExcelDataFile,
                                                @RequestParam(required = false) Optional<Integer> sheetNumber) throws IOException, ParseException {
-        antibiogramService.saveFromFile(new ByteArrayResource(readExcelDataFile.getBytes()), sheetNumber);
+        antibiogramService.saveFromFile(new ByteArrayResource(readExcelDataFile.getBytes()),
+                sheetNumber, readExcelDataFile.getOriginalFilename());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/import/cgm")
     public ResponseEntity mapReadExcelDataToDB2(@RequestParam("file") MultipartFile readExcelDataFile,
                                                 @RequestParam(required = false) Optional<Integer> sheetNumber) throws IOException, ParseException {
-        antibiogramService.saveFromFileCGM(new ByteArrayResource(readExcelDataFile.getBytes()), sheetNumber);
+        antibiogramService.saveFromFileCGM(new ByteArrayResource(readExcelDataFile.getBytes()),
+                sheetNumber, readExcelDataFile.getOriginalFilename());
         return ResponseEntity.ok().build();
     }
 

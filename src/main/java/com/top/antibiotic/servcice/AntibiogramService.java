@@ -1,9 +1,11 @@
 package com.top.antibiotic.servcice;
 
 import com.monitorjbl.xlsx.StreamingReader;
+import com.top.antibiotic.data.ExcelCgmRowData;
 import com.top.antibiotic.dto.AntibiogramResponse;
 import com.top.antibiotic.entities.*;
 import com.top.antibiotic.exceptions.AntibioticsException;
+import com.top.antibiotic.exceptions.ImportExcelRowException;
 import com.top.antibiotic.mapper.AntibiogramMapper;
 import com.top.antibiotic.repository.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -40,6 +43,8 @@ public class AntibiogramService {
     private final AntibioticRepository antibioticRepository;
     private final ExaminationRepository examinationRepository;
     private final ExaminationProviderRepository examinationProviderRepository;
+    private final ExcelRowErrorInfoRepository excelRowErrorInfoRepository;
+    private final ImportDataInfoRepository importDataInfoRepository;
 
     private final AntibiogramRepository antibiogramRepository;
     private final AntibiogramMapper antibiogramMapper;
@@ -86,11 +91,6 @@ public class AntibiogramService {
 
     Boolean parseStringToBoolean(String s) {
         return s.startsWith("T") || s.startsWith("1") || s.startsWith("t");
-    }
-
-    List<String> generateListOfItems(String s) {
-        return Arrays.asList(s.replaceAll("\\[", "")
-                .replaceAll("\\]", "").replaceAll(" ", "").split(","));
     }
 
     Ward parseWard(String name, Instant date) {
@@ -193,7 +193,8 @@ public class AntibiogramService {
 
     @Async()
     //@Transactional
-    public void saveFromFileCGM(ByteArrayResource reapExcelDataFile, Optional<Integer> sheetNumber) throws IOException, ParseException {
+    public void saveFromFileCGM(ByteArrayResource reapExcelDataFile, Optional<Integer> sheetNumber,
+                                String fileName) throws IOException, ParseException {
         String providerName = "CGM";
 
         Workbook workbook = StreamingReader.builder().rowCacheSize(100) // number of rows to keep in memory
@@ -210,18 +211,33 @@ public class AntibiogramService {
             examinationProvider = examinationProviderRepository.save(ExaminationProvider.builder().name(providerName).build());
         }
 
+        ImportDataInfo importDataInfo = importDataInfoRepository.save(ImportDataInfo.builder()
+                        .createdDate(Instant.now())
+                        .formatType("CGM")
+                        .status("creating")
+                        .fileName(fileName)
+                        .sheetNumber(sheetNumber.orElse(1))
+                        .build());
+
+        Long numberOfLines = 0L;
+        Long numberOfFailedLines = 0L;
+
         int rowNo = -1;
         while (rowIterator.hasNext()) {
+            Boolean err = false;
             try {
                 Row row = rowIterator.next();
+                numberOfLines++;
                 rowNo = rowNo + 1;
                 if (rowNo == 0) {
                     continue;
                 }
 
-                List<String> items = extractRow(row);
+                //List<String> items = extractRow(row);
+                ExcelCgmRowData excelCgmRowData = new ExcelCgmRowData(extractRow(row));
 
-                Long examinationNumber = Long.parseLong(items.get(3));
+                //Long examinationNumber = Long.parseLong(items.get(3));
+                Long examinationNumber = excelCgmRowData.getExaminationNumber();
 
                 if (SKIP_DUPLICATE_EXAMINATION) {
                     // do not proceed if sb previously pushed this file or file with this Examination
@@ -236,15 +252,14 @@ public class AntibiogramService {
 
                 Instant date = Instant.now();
 
-                Ward ward = parseWard(items.get(1), date);
-                Patient patient = parsePatient(items.get(19), items.get(18), items.get(21), date);
-                Bacteria bacteria = parseBacteria(items.get(10), null, date);
-                Material material = parseMaterial(items.get(14), date);
+                Ward ward = parseWard(excelCgmRowData.getWardName(), date);
+                Patient patient = parsePatient(excelCgmRowData.getPatientFirstName(),
+                        excelCgmRowData.getPatientSecondName(), excelCgmRowData.getPatientPesel(), date);
+                Bacteria bacteria = parseBacteria(excelCgmRowData.getBacteriaName(), null, date);
+                Material material = parseMaterial(excelCgmRowData.getMaterialName(), date);
 
                 Examination examination;
-                String pattern = "yy-MM-dd";
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-                Date dateInserted = simpleDateFormat.parse(items.get(2));
+                Date dateInserted = excelCgmRowData.getDateInserted();
                 try {
                     examination = examinationRepository.findByNumberAndExaminationProvider(
                                     examinationNumber, examinationProvider)
@@ -260,24 +275,49 @@ public class AntibiogramService {
                             .build());
                 }
 
-                for (String resistantAntibioticName : generateListOfItems(items.get(15))) {
+                for (String resistantAntibioticName : excelCgmRowData.getResistantAntibiotics()) {
                     parseAntibiogram(resistantAntibioticName, "R", ward, date, patient,
                             dateInserted, material, bacteria, examination);
                 }
-                for (String resistantAntibioticName : generateListOfItems(items.get(16))) {
+                for (String resistantAntibioticName : excelCgmRowData.getIntermediateAntibiotics()) {
                     parseAntibiogram(resistantAntibioticName, "I", ward, date, patient,
                             dateInserted, material, bacteria, examination);
                 }
-                for (String resistantAntibioticName : generateListOfItems(items.get(17))) {
+                for (String resistantAntibioticName : excelCgmRowData.getSusceptibleAntibiotics()) {
                     parseAntibiogram(resistantAntibioticName, "S", ward, date, patient,
                             dateInserted, material, bacteria, examination);
                 }
                 try {
                     em.flush();
                     em.clear();
-                } catch (TransactionRequiredException e) {}
-            } catch (Exception e) {}
+                } catch (TransactionRequiredException ignored) {}
+            } catch (ImportExcelRowException iex) {
+                excelRowErrorInfoRepository.save(ExcelRowErrorInfo.builder()
+                            .receivedValue(iex.getReceivedValue())
+                            .expectedType(iex.getExpectedType())
+                            .cellNumber(iex.getCellNumber())
+                            .message(StringUtils.abbreviate(iex.getMessage(), 65535))
+                            .importDataInfo(importDataInfo)
+                            .rowNumber(numberOfLines)
+                            .build());
+                err = true;
+            } catch (Exception e) {
+                excelRowErrorInfoRepository.save(ExcelRowErrorInfo.builder()
+                        .message(StringUtils.abbreviate(e.getMessage(), 65535))
+                        .importDataInfo(importDataInfo)
+                        .rowNumber(numberOfLines)
+                        .build());
+                err = true;
+            }
+
+            if (err)
+                numberOfFailedLines++;
         }
+
+        importDataInfo.setStatus("done");
+        importDataInfo.setNumberOfLines(numberOfLines);
+        importDataInfo.setNumberOfFailedLines(numberOfFailedLines);
+        importDataInfoRepository.save(importDataInfo);
         log.info("done...CGM");
     }
 
@@ -300,7 +340,8 @@ public class AntibiogramService {
 
     @Async()
     //@Transactional()
-    public void saveFromFile(ByteArrayResource reapExcelDataFile, Optional<Integer> sheetNumber) throws IOException, ParseException {
+    public void saveFromFile(ByteArrayResource reapExcelDataFile, Optional<Integer> sheetNumber,
+                             String fileName) throws IOException, ParseException {
 
         String providerName = "ASSECO";
 
@@ -320,10 +361,22 @@ public class AntibiogramService {
             examinationProvider = examinationProviderRepository.save(ExaminationProvider.builder().name(providerName).build());
         }
 
+        ImportDataInfo importDataInfo = importDataInfoRepository.save(ImportDataInfo.builder()
+                .createdDate(Instant.now())
+                .formatType("ASSECO")
+                .status("creating")
+                .fileName(fileName)
+                .sheetNumber(sheetNumber.orElse(2))
+                .build());
+
+        Long numberOfLines = 0L;
+        Long numberOfFailedLines = 0L;
+
         int rowNo = -1;
         while (rowIterator.hasNext()) {
             try {
                 Row row = rowIterator.next();
+                numberOfLines++;
                 rowNo = rowNo + 1;
                 if (rowNo == 0) {
                     continue;  // skip header row
@@ -341,7 +394,8 @@ public class AntibiogramService {
                 }
 
                 if (items.size() < 27) {
-                    continue;
+                    log.info(items.toString());
+                    throw new RuntimeException("Columns count is less than 27");
                 }
 
                 if (SKIP_DUPLICATE_EXAMINATION) {
@@ -432,6 +486,12 @@ public class AntibiogramService {
                 } catch (TransactionRequiredException e) {}
             } catch (Exception e) {
                 log.info(e.toString());
+                numberOfFailedLines++;
+                excelRowErrorInfoRepository.save(ExcelRowErrorInfo.builder()
+                        .message(StringUtils.abbreviate(e.getMessage(), 65535))
+                        .importDataInfo(importDataInfo)
+                        .rowNumber(numberOfLines)
+                        .build());
             }
         }
 
@@ -441,6 +501,11 @@ public class AntibiogramService {
 //            em.flush();
 //            em.clear();
 //        }
+        importDataInfo.setStatus("done");
+        importDataInfo.setNumberOfLines(numberOfLines);
+        importDataInfo.setNumberOfFailedLines(numberOfFailedLines);
+        importDataInfoRepository.save(importDataInfo);
+
         log.info("done...ASSECO");
     }
 }

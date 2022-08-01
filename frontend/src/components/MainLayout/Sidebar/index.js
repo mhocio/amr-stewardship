@@ -10,6 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import PersonIcon from '@mui/icons-material/Person';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import NumbersIcon from '@mui/icons-material/Numbers';
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
@@ -74,6 +75,12 @@ export default function Sidebar({ toggleDrawer, isOpen }) {
             <NumbersIcon />
           </ListItemIcon>
           <ListItemText primary='FRAT' />
+        </ListItem>
+        <ListItem button key='Logi Importu' onClick={() => navigate('/page/importLogs')}>
+          <ListItemIcon>
+            <DriveFolderUploadIcon />
+          </ListItemIcon>
+          <ListItemText primary='Logi Importu' />
         </ListItem>
       </List>
     </Drawer>
