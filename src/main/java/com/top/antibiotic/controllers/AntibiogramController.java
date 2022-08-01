@@ -22,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.ParseException;
@@ -40,18 +42,9 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class AntibiogramController {
 
-    private final AntibiogramRepository antibiogramRepository;
-
-    private final WardRepository wardRepository;
     private final PatientRepository patientRepository;
-    private final MaterialRepository materialRepository;
-    private final BacteriaRepository bacteriaRepository;
-    private final AntibioticRepository antibioticRepository;
-    private final ExaminationRepository examinationRepository;
 
-    private final WardService wardService;
     private final AntibiogramService antibiogramService;
-    private final PatientService patientService;
 
     @GetMapping
     public ResponseEntity<List<AntibiogramResponse>> getAllAntibiograms() {
@@ -89,6 +82,14 @@ public class AntibiogramController {
     public ResponseEntity mapReadExcelDataToDB2(@RequestParam("file") MultipartFile readExcelDataFile,
                                                 @RequestParam(required = false) Optional<Integer> sheetNumber) throws IOException, ParseException {
         antibiogramService.saveFromFileCGM(new ByteArrayResource(readExcelDataFile.getBytes()), sheetNumber);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value = "/data")
+    @Transactional
+    public ResponseEntity deleteAllData() {
+        antibiogramService.deleteAllData();
+
         return ResponseEntity.ok().build();
     }
 }

@@ -46,6 +46,20 @@ public class AntibiogramService {
 
     private final Boolean SKIP_DUPLICATE_EXAMINATION = true;
 
+    @Transactional
+    public void deleteAllData() {
+        em.createNativeQuery("set FOREIGN_KEY_CHECKS = 0;").executeUpdate();
+        em.createNativeQuery("TRUNCATE antibiogram;").executeUpdate();
+        em.createNativeQuery("TRUNCATE antibiotic;").executeUpdate();
+        em.createNativeQuery("TRUNCATE bacteria;").executeUpdate();
+        em.createNativeQuery("TRUNCATE examination;").executeUpdate();
+        em.createNativeQuery("TRUNCATE examination_provider;").executeUpdate();
+        em.createNativeQuery("TRUNCATE material;").executeUpdate();
+        em.createNativeQuery("TRUNCATE patient;").executeUpdate();
+        em.createNativeQuery("TRUNCATE ward;").executeUpdate();
+        em.createNativeQuery("set FOREIGN_KEY_CHECKS = 1;").executeUpdate();
+    }
+
     @Transactional(readOnly = true)
     public List<AntibiogramResponse> getAll() {
         return antibiogramRepository.findAll()
@@ -416,7 +430,9 @@ public class AntibiogramService {
                     em.flush();
                     em.clear();
                 } catch (TransactionRequiredException e) {}
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                log.info(e.toString());
+            }
         }
 
 //        if (toInsert.size() > 0) {
