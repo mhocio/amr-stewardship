@@ -72,7 +72,7 @@ export default function Header({ toggleDrawer, isOpen }) {
               wrap="nowrap"
             >
               <Typography variant="h6" noWrap component="div">
-                System do zarządzania antybiotykoterapią
+                System do zarządzania antybiotykoterapią (v 1.0)
               </Typography>
             </Grid>
           </Grid>
