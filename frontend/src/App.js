@@ -18,6 +18,7 @@ import FratPage from "./pages/FratPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ImportLogsPage from "./pages/ImportLogsPage";
+import OptionsPage from "./pages/OptionsPage";
 import { AuthContext } from "./context/auth";
 import { LoadingProvider } from "./loading/loading-context";
 
@@ -96,6 +97,7 @@ function App() {
                   <Route path="/page/trends" element={<TrendsPage />} />
                   <Route path="/page/patients" element={<PatientsPage />} />
                   <Route path="/page/importLogs" element={<ImportLogsPage />} />
+                  <Route path="/page/options" element={<OptionsPage />} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/auth" />} />

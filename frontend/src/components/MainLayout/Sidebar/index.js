@@ -82,6 +82,12 @@ export default function Sidebar({ toggleDrawer, isOpen }) {
           </ListItemIcon>
           <ListItemText primary='Logi Importu' />
         </ListItem>
+        <ListItem button key='Opcje' onClick={() => navigate('/page/options')}>
+          <ListItemIcon>
+            <SettingsIcon />
+          </ListItemIcon>
+          <ListItemText primary='Opcje' />
+        </ListItem>
       </List>
     </Drawer>
 
