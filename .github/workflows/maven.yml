@@ -13,7 +13,7 @@ jobs:
 
   build:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     
     env:
       DB_DATABASE: db_antibiotic
@@ -21,13 +21,15 @@ jobs:
       DB_PASSWORD: ThePassword
     
     steps:
+    - uses: actions/checkout@v2
     - name: Set up MySQL
       run: |
-        sudo /etc/init.d/mysql start
-        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }}; ' -uroot -proot
-        mysql -e "create user '${{ env.DB_USER }}' identified by '${{ env.DB_PASSWORD }}';" -uroot -proot
-        mysql -e 'grant all on *.* to '${{ env.DB_USER }}'; ' -uroot -proot
-    - uses: actions/checkout@v2
+        sudo apt-get update
+        sudo apt-get install -y mysql-server
+        sudo systemctl start mysql
+        sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
+        sudo mysql -e "CREATE USER IF NOT EXISTS '${{ env.DB_USER }}'@'%' IDENTIFIED BY '${{ env.DB_PASSWORD }}';"
+        sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO '${{ env.DB_USER }}'@'%'; FLUSH PRIVILEGES;"
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
