@@ -16,7 +16,7 @@ jobs:
       run: docker compose up --build -d
     - name: Wait for services to be ready
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:8081/actuator/health; do sleep 5; done'
+        timeout 60 bash -c 'until curl -f http://localhost:8081/swagger-ui.html; do sleep 5; done'
         timeout 60 bash -c 'until curl -f http://localhost:9090; do sleep 5; done'
     - name: Run integration tests (if any)
       run: echo "Add integration tests here, e.g., API calls or Selenium"
