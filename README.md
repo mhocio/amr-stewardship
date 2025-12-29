@@ -1,69 +1,64 @@
 # Application supporting antibiotic treatment in hospital
 
-The application is designed to analyse the susceptibility to antibiotics within the strains isolated from the infections and establish the most optimal empiric therapy for hospitalised patients.
+The application analyses antibiotic susceptibility for isolated strains and helps pick empiric therapy for hospitalised patients.
 
 ## Stack
-Java Spring, MySQL, React
+Java 17 (Spring Boot), MySQL, React (MUI), Docker/Docker Compose
 
-## Running using docker-compose ex. Ubuntu 18.04
-System must have installed docker and docker-compose. Note that our  docker-compose.yml file uses version ‘3.7’, so make sure docker-compose is the newest possible version (ex. docker-compose version 1.29.2). 
+## Project layout
+- `src/main/java` – Spring Boot application (REST API, JWT security, FRAT/trend analytics)
+- `src/main/resources` – configuration, templates, static assets (including `robots.txt`)
+- `frontend/` – React SPA with protected routes and upload/import flows
+- `.github/workflows` – CI for Maven and Node.js
 
-In case you have old version of docker-compose, and running Ubuntu, you can run the below functions to update to the newer version:
-$ sudo apt-get remove docker-compose
-$ curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-$ sudo chmod +x /usr/local/bin/docker-compose
+## Prerequisites
+- Docker + Docker Compose **or** local MySQL 5.7/8.0 running on `localhost:3306`
+- JDK 17 and Maven
+- Node 16.x with npm
 
-## Backend
-### Instalation for Ubuntu
-https://spring.io/guides/gs/accessing-data-mysql/?fbclid=IwAR2iBqbrT-0ExXPz0lzsMMoOIDIDouh8QesojLCHU2AZ1uCN-3AvXKjpnlM#:~:text=Create%20the-,Database,-Open%20a%20terminal
+## Quick start (Docker Compose)
 ```bash
-sudo apt update
-sudo apt install mysql-server
-
-#open a MySQL client as a user who can create new users
-sudo mysql --password
-mysql> create database db_antibiotic; -- Creates the new database
-mysql> create user 'springuser'@'%' identified by 'ThePassword'; -- Creates the user
-mysql> grant all on db_antibiotic.* to 'springuser'@'%'; -- Gives all privileges to the new user on the newly created database
+BACKEND_PORT=8080 FRONTEND_PORT=3000 API_BASE_URL=http://localhost:8080/api docker-compose up --build
 ```
-Next for development install IntelliJ, open project and run the main class.
-Use JDK17 and install
+- Backend available at `http://localhost:8080`
+- Frontend (Nginx build) at `http://localhost:3000`
 
-## Frontend
-### Installation
-To install needed npm packages run
+## Local development
+### Backend
+1. Create database and user (example for local MySQL):
+   ```bash
+   mysql -uroot -p -e "CREATE DATABASE IF NOT EXISTS db_antibiotic;"
+   mysql -uroot -p -e "CREATE USER IF NOT EXISTS 'springuser'@'%' IDENTIFIED BY 'ThePassword';"
+   mysql -uroot -p -e "GRANT ALL PRIVILEGES ON db_antibiotic.* TO 'springuser'@'%'; FLUSH PRIVILEGES;"
+   ```
+2. Run the app:
+   ```bash
+   mvn spring-boot:run
+   ```
+   (defaults: `spring.profiles.active=prod`, DB URL `jdbc:mysql://localhost:3306/db_antibiotic`).
 
+### Frontend
 ```bash
 cd frontend
-npm i
-```
-
-### Usage
-To use the frontend module run
-
-```bash
+npm ci
 npm start
 ```
+The dev server runs on `http://localhost:3000` and proxies API calls to `REACT_APP_API_BASE_URL` if set.
 
-### In case of errors
-https://stackoverflow.com/questions/55763428/react-native-error-enospc-system-limit-for-number-of-file-watchers-reached?fbclid=IwAR2cf9tgvx09vHVw1yRKf-yad0yXCTEGGHeO2duhvwXlBzcroA67I_oc0v8
-```quote
-Solution:
+## Testing
+- Backend: `mvn -DskipTests package` (or `mvn test` once a test DB is available)
+- Frontend: `npm test` (watch) or `npm run build` for a production bundle
 
-Modify the number of system monitoring files
+## CI (GitHub Actions)
+- **Java CI with Maven**: provisions MySQL in the workflow and builds the Spring Boot app.
+- **Node.js CI**: installs dependencies in `frontend/` and runs `npm run build`.
+Workflows live in `.github/workflows/`.
 
-Ubuntu
+## Robots.txt
+- Backend serves `src/main/resources/static/robots.txt` to discourage indexing of API endpoints.
+- Frontend bundle also includes `frontend/public/robots.txt` (CRA default). Adjust contents as needed for deployments.
 
-sudo gedit /etc/sysctl.conf
-
-Add a line at the bottom
-
-fs.inotify.max_user_watches=524288
-
-Then save and exit!
-
-sudo sysctl -p
-
-to check it
-```
-## Documentation
+## Troubleshooting
+- File watchers limit on Linux: add `fs.inotify.max_user_watches=524288` to `/etc/sysctl.conf`, then run `sudo sysctl -p`.
+- If MySQL fails to start in Docker/CI, confirm the port mapping and credentials match `SPRING_DATASOURCE_*`/`MYSQL_*` variables.
+- Maven download issues (restricted egress/proxy): set `MAVEN_MIRROR_URL` to an accessible Maven proxy or configure a local `~/.m2/settings.xml` mirror if outbound access is blocked.
