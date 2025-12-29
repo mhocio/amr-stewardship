@@ -27,9 +27,10 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y mysql-server
         sudo systemctl start mysql
-        sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
-        sudo mysql -e "CREATE USER IF NOT EXISTS '${{ env.DB_USER }}'@'%' IDENTIFIED BY '${{ env.DB_PASSWORD }}';"
-        sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO '${{ env.DB_USER }}'@'%'; FLUSH PRIVILEGES;"
+        sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root'; FLUSH PRIVILEGES;"
+        sudo mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS ${{ env.DB_DATABASE }};"
+        sudo mysql -uroot -proot -e "CREATE USER IF NOT EXISTS '${{ env.DB_USER }}'@'%' IDENTIFIED BY '${{ env.DB_PASSWORD }}';"
+        sudo mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON *.* TO '${{ env.DB_USER }}'@'%'; FLUSH PRIVILEGES;"
     - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
