@@ -80,3 +80,6 @@ packages/react-devtools-extensions/.tempUserDataDir
 packages/react-devtools-inline/dist
 packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
+
+# Temporary lock files from data generator
+data-generator/.~lock.*
